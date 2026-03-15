@@ -178,10 +178,16 @@
           };
         };
 
-        # Format check: `gofmt -l .` must produce no output.
+        # Format check: `gofmt -l` on non-vendor Go files must produce no output.
         fmtCheck = pkgs.runCommandLocal "mdp-fmt" { } ''
-          diff <(cd ${pkgs.lib.cleanSource ./.} && ${pkgs.go}/bin/gofmt -l .) /dev/null \
-            || (echo "gofmt found unformatted files — run: gofmt -w ." && exit 1)
+          src=${pkgs.lib.cleanSource ./.}
+          unformatted=$(find "$src" -name '*.go' -not -path "*/vendor/*" \
+            | xargs ${pkgs.go}/bin/gofmt -l)
+          if [ -n "$unformatted" ]; then
+            echo "gofmt found unformatted files — run: gofmt -w ."
+            echo "$unformatted"
+            exit 1
+          fi
           touch $out
         '';
 
