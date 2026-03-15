@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/daaa1k/mdp/internal/xdg"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +22,19 @@ type R2Config struct {
 	Bucket    string `yaml:"bucket"`
 	PublicURL string `yaml:"public_url"`
 	Endpoint  string `yaml:"endpoint"`
+	AccountID string `yaml:"account_id"`
 	Prefix    string `yaml:"prefix"`
+}
+
+// ResolvedEndpoint returns the endpoint, deriving it from AccountID if not set.
+func (r R2Config) ResolvedEndpoint() string {
+	if r.Endpoint != "" {
+		return r.Endpoint
+	}
+	if r.AccountID != "" {
+		return "https://" + r.AccountID + ".r2.cloudflarestorage.com"
+	}
+	return ""
 }
 
 // NodeBBConfig holds NodeBB settings.
@@ -168,9 +181,9 @@ func loadProjectConfig() (*ProjectConfig, error) {
 	return nil, os.ErrNotExist
 }
 
-// loadGlobalConfig reads the global config file from the OS config directory.
+// loadGlobalConfig reads the global config file from the XDG config directory.
 func loadGlobalConfig() (*GlobalConfig, error) {
-	dir, err := os.UserConfigDir()
+	dir, err := xdg.ConfigDir()
 	if err != nil {
 		return nil, err
 	}

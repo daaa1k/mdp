@@ -89,7 +89,7 @@ func newBackend(cfg *config.Config, debug bool) (backend.Backend, error) {
 		if debug {
 			fmt.Fprintf(os.Stderr, "[debug] uploading to R2 bucket=%s prefix=%s\n", r2cfg.Bucket, r2cfg.Prefix)
 		}
-		return backend.NewR2Backend(r2cfg.Bucket, r2cfg.PublicURL, r2cfg.Endpoint, r2cfg.Prefix)
+		return backend.NewR2Backend(r2cfg.Bucket, r2cfg.PublicURL, r2cfg.ResolvedEndpoint(), r2cfg.Prefix)
 
 	case config.BackendNodeBB:
 		nbcfg := cfg.EffectiveNodeBB()

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -68,7 +69,7 @@ func (b *R2Backend) Save(ctx context.Context, data []byte, filename string) (str
 		return "", fmt.Errorf("upload to R2: %w", err)
 	}
 
-	return b.PublicURL + "/" + key, nil
+	return strings.TrimRight(b.PublicURL, "/") + "/" + key, nil
 }
 
 // mimeType returns the MIME type for a filename based on its extension.

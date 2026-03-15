@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/daaa1k/mdp/internal/xdg"
 )
 
 // NodeBBBackend uploads images to a NodeBB forum instance.
@@ -228,9 +230,9 @@ func resolveURL(imageURL, baseURL string) string {
 	return base.ResolveReference(ref).String()
 }
 
-// nodeBBCookieFile returns the platform-specific cache file path for cookies.
+// nodeBBCookieFile returns the XDG-compliant cache file path for cookies.
 func nodeBBCookieFile() string {
-	dir, err := os.UserCacheDir()
+	dir, err := xdg.CacheDir()
 	if err != nil {
 		return ""
 	}

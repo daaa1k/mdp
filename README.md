@@ -144,8 +144,7 @@ nodebb:
 
 ### Global config
 
-- **Unix**: `~/.config/mdp/config.yaml` (or `$XDG_CONFIG_HOME/mdp/config.yaml`)
-- **macOS**: `~/Library/Application Support/mdp/config.yaml`
+- **Unix / macOS**: `~/.config/mdp/config.yaml` (or `$XDG_CONFIG_HOME/mdp/config.yaml`)
 - **Windows**: `%APPDATA%\mdp\config.yaml`
 
 ```yaml
@@ -208,8 +207,7 @@ export NODEBB_PASSWORD=...
 ```
 
 Session cookies are cached so you only need to log in once:
-- **Unix**: `~/.cache/mdp/nodebb_cookies.json`
-- **macOS**: `~/Library/Caches/mdp/nodebb_cookies.json`
+- **Unix / macOS**: `~/.cache/mdp/nodebb_cookies.json` (or `$XDG_CACHE_HOME/mdp/nodebb_cookies.json`)
 - **Windows**: `%LOCALAPPDATA%\mdp\nodebb_cookies.json`
 
 ## License
