@@ -50,7 +50,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v16
 
       - name: Cache Nix store
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /nix/store
           # No gc-max-store-size: with a 2G limit GC deleted critical artifacts
