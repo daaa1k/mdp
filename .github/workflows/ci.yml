@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Test
+        run: go test -race ./...
+
+      - name: Vet
+        run: go vet ./...
+
+  nix:
+    name: Nix flake check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Cache Nix store
+        uses: actions/cache@v4
+        with:
+          path: /nix/store
+          # No gc-max-store-size: with a 2G limit GC deleted critical artifacts
+          # causing slower warm-cache builds. Compressed store ≈1GB (Linux) / 700MB (macOS).
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'go.sum') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
+
+      - name: Set up Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: daaa1k
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          pushFilter: '-source$'
+
+      - name: Build (populate cache)
+        run: nix build
+
+      - name: Flake check
+        run: nix flake check
