@@ -109,7 +109,12 @@ echo "${VERSION}" > VERSION
 echo "==> Running checks"
 
 go vet ./...
-gofmt -l . | grep -v vendor | (! grep .)
+UNFORMATTED=$(gofmt -l . | grep -v vendor || true)
+if [[ -n "$UNFORMATTED" ]]; then
+  echo "error: unformatted files:" >&2
+  echo "$UNFORMATTED" >&2
+  exit 1
+fi
 
 ########################################
 # commit and tag
