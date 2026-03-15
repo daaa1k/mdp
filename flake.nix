@@ -195,7 +195,7 @@
             chmod -R u+w src
             ln -sf ${mdpaste.goModules} src/vendor
             cd src
-            HOME=$TMPDIR GOFLAGS=-mod=vendor go vet ./...
+            HOME=$TMPDIR CGO_ENABLED=0 GOFLAGS=-mod=vendor go vet ./...
             touch $out
           '';
       in
