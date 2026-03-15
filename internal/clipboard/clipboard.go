@@ -61,16 +61,38 @@ func getMacOSImages() ([]Image, error) {
 }
 
 func getMacOSFileDropImages() ([]Image, error) {
-	script := `tell application "System Events"
-		set theClip to the clipboard as «class furl»
-		return POSIX path of theClip
-	end tell`
-	out, err := runAppleScript(script)
-	if err != nil || strings.TrimSpace(out) == "" {
+	// Use JXA (JavaScript for Automation) to access NSPasteboard directly.
+	// AppleScript «class furl» only returns the first file; pasteboardItems handles N files.
+	// Finder copies files as persistent file-reference URLs (file:///.file/id=...).
+	// url.filePathURL resolves these to regular file-path URLs before extracting the path.
+	script := `
+ObjC.import("AppKit");
+var pb = $.NSPasteboard.generalPasteboard;
+var items = pb.pasteboardItems;
+var result = [];
+if (items) {
+	var count = items.count;
+	for (var i = 0; i < count; i++) {
+		var item = items.objectAtIndex(i);
+		var urlStr = item.stringForType("public.file-url");
+		if (urlStr) {
+			var url = $.NSURL.URLWithString($(ObjC.unwrap(urlStr)));
+			var pathURL = url.filePathURL;
+			if (pathURL) {
+				result.push(ObjC.unwrap(pathURL.path));
+			}
+		}
+	}
+}
+result.join("\n");
+`
+	cmd := exec.Command("osascript", "-l", "JavaScript", "-e", script)
+	out, err := cmd.Output()
+	if err != nil || strings.TrimSpace(string(out)) == "" {
 		return nil, fmt.Errorf("no file drop")
 	}
 	var imgs []Image
-	for _, p := range strings.Split(strings.TrimSpace(out), "\n") {
+	for _, p := range strings.Split(strings.TrimSpace(string(out)), "\n") {
 		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
@@ -81,7 +103,7 @@ func getMacOSFileDropImages() ([]Image, error) {
 		}
 		ext := strings.TrimPrefix(filepath.Ext(p), ".")
 		if ext == "" {
-			ext = "webp"
+			ext = "png"
 		}
 		imgs = append(imgs, Image{Data: data, Ext: strings.ToLower(ext)})
 	}
