@@ -19,9 +19,9 @@ import (
 
 // NodeBBBackend uploads images to a NodeBB forum instance.
 type NodeBBBackend struct {
-	BaseURL  string
-	client   *http.Client
-	jar      *cookiejar.Jar
+	BaseURL    string
+	client     *http.Client
+	jar        *cookiejar.Jar
 	cookieFile string
 }
 
