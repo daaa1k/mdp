@@ -73,8 +73,8 @@ done
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-if [[ "$BRANCH" != "master" ]]; then
-  echo "error: must be on master (current: $BRANCH)" >&2
+if [[ "$BRANCH" != "main" ]]; then
+  echo "error: must be on main (current: $BRANCH)" >&2
   exit 1
 fi
 
@@ -126,7 +126,7 @@ git tag "$TAG"
 
 echo "==> Push"
 
-git push origin master "$TAG"
+git push origin main "$TAG"
 
 ########################################
 # wait for workflow
@@ -208,7 +208,7 @@ echo "==> Commit flake update"
 git add flake.nix
 git commit -m "chore(nix): update binary hashes for ${TAG}"
 
-git push origin master
+git push origin main
 
 ########################################
 # update homebrew formula
@@ -236,7 +236,7 @@ sedi "s|sha256 \"[a-f0-9]*\" # linux-x86_64|sha256 \"${LINUX_SHA256}\" # linux-x
 git add "$FORMULA"
 git commit -m "chore(brew): update formula to ${TAG}"
 
-git push origin master
+git push origin main
 
 ########################################
 # push to homebrew tap repo
