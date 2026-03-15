@@ -8,7 +8,7 @@ import (
 	"path"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -30,26 +30,16 @@ func NewR2Backend(bucket, publicURL, endpoint, prefix string) (*R2Backend, error
 		return nil, fmt.Errorf("R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY must be set")
 	}
 
-	customResolver := aws.EndpointResolverWithOptionsFunc(
-		func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-			return aws.Endpoint{
-				URL:               endpoint,
-				SigningRegion:     "auto",
-				HostnameImmutable: true,
-			}, nil
-		},
-	)
-
-	cfg, err := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion("auto"),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
-		config.WithEndpointResolverWithOptions(customResolver),
+	cfg, err := awsconfig.LoadDefaultConfig(context.Background(),
+		awsconfig.WithRegion("auto"),
+		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("load R2 config: %w", err)
 	}
 
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.BaseEndpoint = aws.String(endpoint)
 		o.UsePathStyle = true
 	})
 
@@ -62,32 +52,28 @@ func NewR2Backend(bucket, publicURL, endpoint, prefix string) (*R2Backend, error
 }
 
 // Save uploads data to R2 and returns the public URL of the uploaded object.
-func (b *R2Backend) Save(data []byte, filename string) (string, error) {
+func (b *R2Backend) Save(ctx context.Context, data []byte, filename string) (string, error) {
 	key := filename
 	if b.Prefix != "" {
 		key = path.Join(b.Prefix, filename)
 	}
 
-	contentType := mimeType(filename)
-
-	_, err := b.client.PutObject(context.Background(), &s3.PutObjectInput{
+	_, err := b.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(b.Bucket),
 		Key:         aws.String(key),
 		Body:        bytes.NewReader(data),
-		ContentType: aws.String(contentType),
+		ContentType: aws.String(mimeType(filename)),
 	})
 	if err != nil {
 		return "", fmt.Errorf("upload to R2: %w", err)
 	}
 
-	url := b.PublicURL + "/" + key
-	return url, nil
+	return b.PublicURL + "/" + key, nil
 }
 
 // mimeType returns the MIME type for a filename based on its extension.
 func mimeType(filename string) string {
-	ext := path.Ext(filename)
-	switch ext {
+	switch path.Ext(filename) {
 	case ".png":
 		return "image/png"
 	case ".jpg", ".jpeg":

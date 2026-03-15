@@ -66,10 +66,10 @@ nix store prefetch-file --hash-type sha256 --json \
 main.go                      CLI entry point (cobra)
 internal/
   naming/     naming.go      Timestamp-based filename generation
-  markdown/   markdown.go    Markdown image link generation
-  config/     config.go      TOML config loading (project + global)
+  config/     config.go      YAML config loading (project + global)
   clipboard/  clipboard.go   Cross-platform clipboard image reading
   backend/
+    backend.go               Backend interface
     local.go                 Local filesystem backend
     r2.go                    Cloudflare R2 backend (S3-compatible)
     nodebb.go                NodeBB forum backend
@@ -78,7 +78,7 @@ internal/
 ## Configuration priority
 
 ```
-CLI flag --backend > .mdp.toml (walks up from CWD) > ~/.config/mdp/config.toml > local
+CLI flag --backend > .mdp.yaml (walks up from CWD) > config.yaml in OS config dir > local
 ```
 
 ## Environment variables

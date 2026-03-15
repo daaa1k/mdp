@@ -3,9 +3,8 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 
-	"github.com/BurntSushi/toml"
+	"gopkg.in/yaml.v3"
 )
 
 // BackendType represents the storage backend choice.
@@ -19,39 +18,39 @@ const (
 
 // R2Config holds Cloudflare R2 settings.
 type R2Config struct {
-	Bucket    string `toml:"bucket"`
-	PublicURL string `toml:"public_url"`
-	Endpoint  string `toml:"endpoint"`
-	Prefix    string `toml:"prefix"`
+	Bucket    string `yaml:"bucket"`
+	PublicURL string `yaml:"public_url"`
+	Endpoint  string `yaml:"endpoint"`
+	Prefix    string `yaml:"prefix"`
 }
 
 // NodeBBConfig holds NodeBB settings.
 type NodeBBConfig struct {
-	URL string `toml:"url"`
+	URL string `yaml:"url"`
 }
 
 // LocalConfig holds local backend settings.
 type LocalConfig struct {
-	Dir string `toml:"dir"`
+	Dir string `yaml:"dir"`
 }
 
-// ProjectConfig is loaded from .mdp.toml in the project or its parents.
+// ProjectConfig is loaded from .mdp.yaml in the project or its parents.
 type ProjectConfig struct {
-	Backend BackendType  `toml:"backend"`
-	Local   LocalConfig  `toml:"local"`
-	R2      R2Config     `toml:"r2"`
-	NodeBB  NodeBBConfig `toml:"nodebb"`
+	Backend BackendType  `yaml:"backend"`
+	Local   LocalConfig  `yaml:"local"`
+	R2      R2Config     `yaml:"r2"`
+	NodeBB  NodeBBConfig `yaml:"nodebb"`
 }
 
 // GlobalConfig is loaded from the user's config directory.
 type GlobalConfig struct {
-	Backend BackendType  `toml:"backend"`
-	Local   LocalConfig  `toml:"local"`
-	R2      R2Config     `toml:"r2"`
-	NodeBB  NodeBBConfig `toml:"nodebb"`
+	Backend BackendType  `yaml:"backend"`
+	Local   LocalConfig  `yaml:"local"`
+	R2      R2Config     `yaml:"r2"`
+	NodeBB  NodeBBConfig `yaml:"nodebb"`
 
 	// WSL2: optional path to powershell.exe
-	PowerShellPath string `toml:"powershell_path"`
+	PowerShellPath string `yaml:"powershell_path"`
 }
 
 // Config is the merged configuration.
@@ -145,17 +144,17 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-// loadProjectConfig walks up from CWD looking for .mdp.toml.
+// loadProjectConfig walks up from CWD looking for .mdp.yaml.
 func loadProjectConfig() (*ProjectConfig, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 	for {
-		path := filepath.Join(dir, ".mdp.toml")
-		if _, err := os.Stat(path); err == nil {
+		path := filepath.Join(dir, ".mdp.yaml")
+		if data, err := os.ReadFile(path); err == nil {
 			var cfg ProjectConfig
-			if _, err := toml.DecodeFile(path, &cfg); err != nil {
+			if err := yaml.Unmarshal(data, &cfg); err != nil {
 				return nil, err
 			}
 			return &cfg, nil
@@ -169,33 +168,18 @@ func loadProjectConfig() (*ProjectConfig, error) {
 	return nil, os.ErrNotExist
 }
 
-// globalConfigPath returns the platform-specific global config path.
-func globalConfigPath() string {
-	if runtime.GOOS == "windows" {
-		if appdata := os.Getenv("APPDATA"); appdata != "" {
-			return filepath.Join(appdata, "mdp", "config.toml")
-		}
-	}
-	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-		return filepath.Join(xdg, "mdp", "config.toml")
-	}
-	if home := os.Getenv("HOME"); home != "" {
-		return filepath.Join(home, ".config", "mdp", "config.toml")
-	}
-	return ""
-}
-
-// loadGlobalConfig reads the global config file.
+// loadGlobalConfig reads the global config file from the OS config directory.
 func loadGlobalConfig() (*GlobalConfig, error) {
-	path := globalConfigPath()
-	if path == "" {
-		return nil, os.ErrNotExist
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return nil, err
 	}
-	if _, err := os.Stat(path); err != nil {
+	data, err := os.ReadFile(filepath.Join(dir, "mdp", "config.yaml"))
+	if err != nil {
 		return nil, err
 	}
 	var cfg GlobalConfig
-	if _, err := toml.DecodeFile(path, &cfg); err != nil {
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil

@@ -49,13 +49,14 @@ inputs.mdp.url = "github:daaa1k/mdp";
         public_url = "https://cdn.example.com";
         endpoint = "https://<account-id>.r2.cloudflarestorage.com";
         prefix = "images";
+        # R2 credentials via R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY env vars.
       };
     };
   };
 }
 ```
 
-This writes the configuration to `$XDG_CONFIG_HOME/mdp/config.toml` automatically.
+This writes the configuration to `$XDG_CONFIG_HOME/mdp/config.yaml` automatically.
 Credentials (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, etc.) must still be provided
 via environment variables.
 
@@ -115,48 +116,49 @@ mdp --debug
 
 ## Configuration
 
-Configuration files use TOML format. Backend selection follows this priority chain:
+Configuration files use YAML format. Backend selection follows this priority chain:
 
 ```
-CLI flag > project config (.mdp.toml) > global config > local (fallback)
+CLI flag > project config (.mdp.yaml) > global config > local (fallback)
 ```
 
-### Project config (`.mdp.toml`)
+### Project config (`.mdp.yaml`)
 
 Place this file in your project root (mdp walks up from the current directory to find it):
 
-```toml
-backend = "r2"
+```yaml
+backend: r2
 
-[local]
-dir = "images"
+local:
+  dir: images
 
-[r2]
-bucket = "my-bucket"
-public_url = "https://cdn.example.com"
-endpoint = "https://<account-id>.r2.cloudflarestorage.com"
-prefix = "images"
+r2:
+  bucket: my-bucket
+  public_url: https://cdn.example.com
+  endpoint: https://<account-id>.r2.cloudflarestorage.com
+  prefix: images
 
-[nodebb]
-url = "https://forum.example.com"
+nodebb:
+  url: https://forum.example.com
 ```
 
 ### Global config
 
-- **Unix**: `~/.config/mdp/config.toml` (or `$XDG_CONFIG_HOME/mdp/config.toml`)
-- **Windows**: `%APPDATA%\mdp\config.toml`
+- **Unix**: `~/.config/mdp/config.yaml` (or `$XDG_CONFIG_HOME/mdp/config.yaml`)
+- **macOS**: `~/Library/Application Support/mdp/config.yaml`
+- **Windows**: `%APPDATA%\mdp\config.yaml`
 
-```toml
-backend = "local"
+```yaml
+backend: local
 
-[local]
-dir = "images"
+local:
+  dir: images
 ```
 
 #### WSL2: custom PowerShell path
 
-```toml
-powershell_path = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+```yaml
+powershell_path: /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 ```
 
 ## Backends
@@ -165,21 +167,21 @@ powershell_path = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 
 Saves images to a local directory and returns a relative path.
 
-```toml
-[local]
-dir = "images"   # default
+```yaml
+local:
+  dir: images   # default
 ```
 
 ### r2
 
 Uploads to Cloudflare R2 via the S3-compatible API.
 
-```toml
-[r2]
-bucket = "my-bucket"
-public_url = "https://cdn.example.com"
-endpoint = "https://<account-id>.r2.cloudflarestorage.com"
-prefix = "images"   # optional key prefix
+```yaml
+r2:
+  bucket: my-bucket
+  public_url: https://cdn.example.com
+  endpoint: https://<account-id>.r2.cloudflarestorage.com
+  prefix: images   # optional key prefix
 ```
 
 Required environment variables:
@@ -193,9 +195,9 @@ export R2_SECRET_ACCESS_KEY=...
 
 Uploads to a NodeBB forum instance.
 
-```toml
-[nodebb]
-url = "https://forum.example.com"
+```yaml
+nodebb:
+  url: https://forum.example.com
 ```
 
 Required environment variables:
@@ -207,6 +209,7 @@ export NODEBB_PASSWORD=...
 
 Session cookies are cached so you only need to log in once:
 - **Unix**: `~/.cache/mdp/nodebb_cookies.json`
+- **macOS**: `~/Library/Caches/mdp/nodebb_cookies.json`
 - **Windows**: `%LOCALAPPDATA%\mdp\nodebb_cookies.json`
 
 ## License

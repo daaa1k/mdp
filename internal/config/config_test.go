@@ -52,12 +52,8 @@ func TestEffectiveLocalDir_FromProject(t *testing.T) {
 
 func TestLoadProjectConfig_FindsFile(t *testing.T) {
 	dir := t.TempDir()
-	content := `backend = "r2"
-[r2]
-bucket = "my-bucket"
-public_url = "https://cdn.example.com"
-`
-	if err := os.WriteFile(filepath.Join(dir, ".mdp.toml"), []byte(content), 0o644); err != nil {
+	content := "backend: r2\nr2:\n  bucket: my-bucket\n  public_url: https://cdn.example.com\n"
+	if err := os.WriteFile(filepath.Join(dir, ".mdp.yaml"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// Change to temp dir for loading.

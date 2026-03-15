@@ -87,7 +87,7 @@
       hmModule = { config, lib, pkgs, ... }:
         let
           cfg = config.programs.mdp;
-          tomlFormat = pkgs.formats.toml { };
+          yamlFormat = pkgs.formats.yaml { };
         in
         {
           options.programs.mdp = {
@@ -108,11 +108,11 @@
             };
 
             settings = lib.mkOption {
-              type = tomlFormat.type;
+              type = yamlFormat.type;
               default = { };
               description = ''
                 Global configuration for mdp written to
-                {file}`$XDG_CONFIG_HOME/mdp/config.toml`.
+                {file}`$XDG_CONFIG_HOME/mdp/config.yaml`.
 
                 Top-level keys:
                 - `backend` — default backend (`"r2"`, `"nodebb"`, or `"local"`)
@@ -145,8 +145,8 @@
           config = lib.mkIf cfg.enable {
             home.packages = [ cfg.package ];
 
-            xdg.configFile."mdp/config.toml" = lib.mkIf (cfg.settings != { }) {
-              source = tomlFormat.generate "mdp-config.toml" cfg.settings;
+            xdg.configFile."mdp/config.yaml" = lib.mkIf (cfg.settings != { }) {
+              source = yamlFormat.generate "mdp-config.yaml" cfg.settings;
             };
           };
         };
@@ -166,7 +166,7 @@
           #   1. Set vendorHash to pkgs.lib.fakeHash
           #   2. Run: nix build .#mdp 2>&1 | grep 'got:'
           #   3. Replace the value below with the hash shown in 'got:'
-          vendorHash = "sha256-XYlS4P6n6azpZv+4try/tkxBTIlGUW5H8g/9xsEnQes=";
+          vendorHash = pkgs.lib.fakeHash;
 
           ldflags = [ "-s" "-w" "-X main.version=${version}" ];
 
