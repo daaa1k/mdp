@@ -22,7 +22,19 @@ type R2Config struct {
 	Bucket    string `yaml:"bucket"`
 	PublicURL string `yaml:"public_url"`
 	Endpoint  string `yaml:"endpoint"`
+	AccountID string `yaml:"account_id"`
 	Prefix    string `yaml:"prefix"`
+}
+
+// ResolvedEndpoint returns the endpoint, deriving it from AccountID if not set.
+func (r R2Config) ResolvedEndpoint() string {
+	if r.Endpoint != "" {
+		return r.Endpoint
+	}
+	if r.AccountID != "" {
+		return "https://" + r.AccountID + ".r2.cloudflarestorage.com"
+	}
+	return ""
 }
 
 // NodeBBConfig holds NodeBB settings.
