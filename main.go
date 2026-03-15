@@ -12,6 +12,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// version is set at build time via -ldflags "-X main.version=v1.2.3"
+var version = "dev"
+
 func main() {
 	if err := rootCmd().Execute(); err != nil {
 		os.Exit(1)
@@ -23,9 +26,10 @@ func rootCmd() *cobra.Command {
 	var debug bool
 
 	cmd := &cobra.Command{
-		Use:   "mdpaste",
-		Short: "Paste clipboard image as Markdown link",
-		Long:  "Reads an image from the clipboard, saves it to the configured backend, and prints a Markdown image link to stdout.",
+		Use:     "mdpaste",
+		Short:   "Paste clipboard image as Markdown link",
+		Long:    "Reads an image from the clipboard, saves it to the configured backend, and prints a Markdown image link to stdout.",
+		Version: version,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run(backendFlag, debug)
 		},
