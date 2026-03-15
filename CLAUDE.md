@@ -26,6 +26,40 @@ gofmt -w .
 go install .
 ```
 
+### Nix
+
+```sh
+# Enter dev shell (provides go, gopls, golangci-lint)
+nix develop
+
+# Build via Nix
+nix build
+
+# Run all checks (fmt, vet, tests)
+nix flake check
+
+# Update flake inputs
+nix flake update
+```
+
+### Updating vendorHash after go.mod changes
+
+1. Set `vendorHash = pkgs.lib.fakeHash;` in `flake.nix`
+2. Run `nix build .#mdpaste 2>&1 | grep 'got:'`
+3. Replace `vendorHash` with the hash shown in `got:`
+
+### Updating binaryHashes after a release
+
+```sh
+# Linux
+nix store prefetch-file --hash-type sha256 --json \
+  https://github.com/daaa1k/mdpaste/releases/download/vX.Y.Z/mdpaste-linux-x86_64
+
+# macOS (aarch64)
+nix store prefetch-file --hash-type sha256 --json \
+  https://github.com/daaa1k/mdpaste/releases/download/vX.Y.Z/mdpaste-macos-aarch64
+```
+
 ## Project structure
 
 ```

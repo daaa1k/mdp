@@ -22,6 +22,50 @@ go install github.com/daaa1k/mdpaste@latest
 
 Download a pre-built binary from [GitHub Releases](https://github.com/daaa1k/mdpaste/releases).
 
+### Nix / Home Manager
+
+Add mdpaste as a flake input and import the Home Manager module:
+
+```nix
+# flake.nix
+inputs.mdpaste.url = "github:daaa1k/mdpaste";
+```
+
+```nix
+# home.nix
+{ inputs, pkgs, ... }: {
+  imports = [ inputs.mdpaste.homeManagerModules.default ];
+
+  programs.mdpaste = {
+    enable = true;
+
+    # Optional: use the pre-built binary instead of compiling from source
+    # package = inputs.mdpaste.packages.${pkgs.system}.mdpaste-bin;
+
+    settings = {
+      backend = "r2";
+      r2 = {
+        bucket = "my-bucket";
+        public_url = "https://cdn.example.com";
+        endpoint = "https://<account-id>.r2.cloudflarestorage.com";
+        prefix = "images";
+      };
+    };
+  };
+}
+```
+
+This writes the configuration to `$XDG_CONFIG_HOME/mdpaste/config.toml` automatically.
+Credentials (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, etc.) must still be provided
+via environment variables.
+
+**Package variants:**
+
+| Attribute | Description |
+|---|---|
+| `packages.${system}.default` | Built from source via `buildGoModule` |
+| `packages.${system}.mdpaste-bin` | Pre-built binary from GitHub Releases (x86_64-linux, aarch64-darwin) |
+
 ## Usage
 
 ```sh
