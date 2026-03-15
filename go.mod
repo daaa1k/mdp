@@ -1,4 +1,4 @@
-module github.com/daaa1k/mdpaste
+module github.com/daaa1k/mdp
 
 go 1.24.7
 

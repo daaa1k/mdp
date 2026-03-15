@@ -232,14 +232,14 @@ func resolveURL(imageURL, baseURL string) string {
 func nodeBBCookieFile() string {
 	if runtime.GOOS == "windows" {
 		if localApp := os.Getenv("LOCALAPPDATA"); localApp != "" {
-			return filepath.Join(localApp, "mdpaste", "nodebb_cookies.json")
+			return filepath.Join(localApp, "mdp", "nodebb_cookies.json")
 		}
 	}
 	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" {
-		return filepath.Join(xdg, "mdpaste", "nodebb_cookies.json")
+		return filepath.Join(xdg, "mdp", "nodebb_cookies.json")
 	}
 	if home := os.Getenv("HOME"); home != "" {
-		return filepath.Join(home, ".cache", "mdpaste", "nodebb_cookies.json")
+		return filepath.Join(home, ".cache", "mdp", "nodebb_cookies.json")
 	}
 	return ""
 }

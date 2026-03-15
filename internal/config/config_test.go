@@ -57,7 +57,7 @@ func TestLoadProjectConfig_FindsFile(t *testing.T) {
 bucket = "my-bucket"
 public_url = "https://cdn.example.com"
 `
-	if err := os.WriteFile(filepath.Join(dir, ".mdpaste.toml"), []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, ".mdp.toml"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// Change to temp dir for loading.

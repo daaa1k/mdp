@@ -35,7 +35,7 @@ type LocalConfig struct {
 	Dir string `toml:"dir"`
 }
 
-// ProjectConfig is loaded from .mdpaste.toml in the project or its parents.
+// ProjectConfig is loaded from .mdp.toml in the project or its parents.
 type ProjectConfig struct {
 	Backend BackendType  `toml:"backend"`
 	Local   LocalConfig  `toml:"local"`
@@ -145,14 +145,14 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-// loadProjectConfig walks up from CWD looking for .mdpaste.toml.
+// loadProjectConfig walks up from CWD looking for .mdp.toml.
 func loadProjectConfig() (*ProjectConfig, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 	for {
-		path := filepath.Join(dir, ".mdpaste.toml")
+		path := filepath.Join(dir, ".mdp.toml")
 		if _, err := os.Stat(path); err == nil {
 			var cfg ProjectConfig
 			if _, err := toml.DecodeFile(path, &cfg); err != nil {
@@ -173,14 +173,14 @@ func loadProjectConfig() (*ProjectConfig, error) {
 func globalConfigPath() string {
 	if runtime.GOOS == "windows" {
 		if appdata := os.Getenv("APPDATA"); appdata != "" {
-			return filepath.Join(appdata, "mdpaste", "config.toml")
+			return filepath.Join(appdata, "mdp", "config.toml")
 		}
 	}
 	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-		return filepath.Join(xdg, "mdpaste", "config.toml")
+		return filepath.Join(xdg, "mdp", "config.toml")
 	}
 	if home := os.Getenv("HOME"); home != "" {
-		return filepath.Join(home, ".config", "mdpaste", "config.toml")
+		return filepath.Join(home, ".config", "mdp", "config.toml")
 	}
 	return ""
 }

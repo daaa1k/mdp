@@ -1,4 +1,4 @@
-# mdpaste
+# mdp
 
 Paste clipboard image as Markdown link.
 
@@ -9,38 +9,38 @@ Reads an image from the clipboard, saves it to the configured backend, and print
 ### Homebrew (macOS / Linux)
 
 ```sh
-brew install daaa1k/tap/mdpaste
+brew install daaa1k/tap/mdp
 ```
 
 ### Go install
 
 ```sh
-go install github.com/daaa1k/mdpaste@latest
+go install github.com/daaa1k/mdp@latest
 ```
 
 ### Download binary
 
-Download a pre-built binary from [GitHub Releases](https://github.com/daaa1k/mdpaste/releases).
+Download a pre-built binary from [GitHub Releases](https://github.com/daaa1k/mdp/releases).
 
 ### Nix / Home Manager
 
-Add mdpaste as a flake input and import the Home Manager module:
+Add mdp as a flake input and import the Home Manager module:
 
 ```nix
 # flake.nix
-inputs.mdpaste.url = "github:daaa1k/mdpaste";
+inputs.mdp.url = "github:daaa1k/mdp";
 ```
 
 ```nix
 # home.nix
 { inputs, pkgs, ... }: {
-  imports = [ inputs.mdpaste.homeManagerModules.default ];
+  imports = [ inputs.mdp.homeManagerModules.default ];
 
-  programs.mdpaste = {
+  programs.mdp = {
     enable = true;
 
     # Optional: use the pre-built binary instead of compiling from source
-    # package = inputs.mdpaste.packages.${pkgs.system}.mdpaste-bin;
+    # package = inputs.mdp.packages.${pkgs.system}.mdp-bin;
 
     settings = {
       backend = "r2";
@@ -55,7 +55,7 @@ inputs.mdpaste.url = "github:daaa1k/mdpaste";
 }
 ```
 
-This writes the configuration to `$XDG_CONFIG_HOME/mdpaste/config.toml` automatically.
+This writes the configuration to `$XDG_CONFIG_HOME/mdp/config.toml` automatically.
 Credentials (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, etc.) must still be provided
 via environment variables.
 
@@ -64,12 +64,12 @@ via environment variables.
 | Attribute | Description |
 |---|---|
 | `packages.${system}.default` | Built from source via `buildGoModule` |
-| `packages.${system}.mdpaste-bin` | Pre-built binary from GitHub Releases (x86_64-linux, aarch64-darwin) |
+| `packages.${system}.mdp-bin` | Pre-built binary from GitHub Releases (x86_64-linux, aarch64-darwin) |
 
 ## Usage
 
 ```sh
-mdpaste
+mdp
 ```
 
 Reads an image from the clipboard, saves it using the configured backend, and prints the Markdown image syntax to stdout.
@@ -89,13 +89,13 @@ Reads an image from the clipboard, saves it using the configured backend, and pr
 
 ```sh
 # Use configured backend
-mdpaste
+mdp
 
 # Override backend via flag
-mdpaste --backend r2
+mdp --backend r2
 
 # Debug mode
-mdpaste --debug
+mdp --debug
 ```
 
 ## Platform support
@@ -118,12 +118,12 @@ mdpaste --debug
 Configuration files use TOML format. Backend selection follows this priority chain:
 
 ```
-CLI flag > project config (.mdpaste.toml) > global config > local (fallback)
+CLI flag > project config (.mdp.toml) > global config > local (fallback)
 ```
 
-### Project config (`.mdpaste.toml`)
+### Project config (`.mdp.toml`)
 
-Place this file in your project root (mdpaste walks up from the current directory to find it):
+Place this file in your project root (mdp walks up from the current directory to find it):
 
 ```toml
 backend = "r2"
@@ -143,8 +143,8 @@ url = "https://forum.example.com"
 
 ### Global config
 
-- **Unix**: `~/.config/mdpaste/config.toml` (or `$XDG_CONFIG_HOME/mdpaste/config.toml`)
-- **Windows**: `%APPDATA%\mdpaste\config.toml`
+- **Unix**: `~/.config/mdp/config.toml` (or `$XDG_CONFIG_HOME/mdp/config.toml`)
+- **Windows**: `%APPDATA%\mdp\config.toml`
 
 ```toml
 backend = "local"
@@ -206,8 +206,8 @@ export NODEBB_PASSWORD=...
 ```
 
 Session cookies are cached so you only need to log in once:
-- **Unix**: `~/.cache/mdpaste/nodebb_cookies.json`
-- **Windows**: `%LOCALAPPDATA%\mdpaste\nodebb_cookies.json`
+- **Unix**: `~/.cache/mdp/nodebb_cookies.json`
+- **Windows**: `%LOCALAPPDATA%\mdp\nodebb_cookies.json`
 
 ## License
 

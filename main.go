@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/daaa1k/mdpaste/internal/backend"
-	"github.com/daaa1k/mdpaste/internal/clipboard"
-	"github.com/daaa1k/mdpaste/internal/config"
-	"github.com/daaa1k/mdpaste/internal/markdown"
-	"github.com/daaa1k/mdpaste/internal/naming"
+	"github.com/daaa1k/mdp/internal/backend"
+	"github.com/daaa1k/mdp/internal/clipboard"
+	"github.com/daaa1k/mdp/internal/config"
+	"github.com/daaa1k/mdp/internal/markdown"
+	"github.com/daaa1k/mdp/internal/naming"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ func rootCmd() *cobra.Command {
 	var debug bool
 
 	cmd := &cobra.Command{
-		Use:     "mdpaste",
+		Use:     "mdp",
 		Short:   "Paste clipboard image as Markdown link",
 		Long:    "Reads an image from the clipboard, saves it to the configured backend, and prints a Markdown image link to stdout.",
 		Version: version,

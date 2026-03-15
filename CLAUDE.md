@@ -1,8 +1,8 @@
-# mdpaste - Go implementation
+# mdp - Go implementation
 
 ## Overview
 
-mdpaste reads an image from the clipboard, saves it to a configured backend, and prints a Markdown image link to stdout.
+mdp reads an image from the clipboard, saves it to a configured backend, and prints a Markdown image link to stdout.
 
 ## Development commands
 
@@ -45,7 +45,7 @@ nix flake update
 ### Updating vendorHash after go.mod changes
 
 1. Set `vendorHash = pkgs.lib.fakeHash;` in `flake.nix`
-2. Run `nix build .#mdpaste 2>&1 | grep 'got:'`
+2. Run `nix build .#mdp 2>&1 | grep 'got:'`
 3. Replace `vendorHash` with the hash shown in `got:`
 
 ### Updating binaryHashes after a release
@@ -53,11 +53,11 @@ nix flake update
 ```sh
 # Linux
 nix store prefetch-file --hash-type sha256 --json \
-  https://github.com/daaa1k/mdpaste/releases/download/vX.Y.Z/mdpaste-linux-x86_64
+  https://github.com/daaa1k/mdp/releases/download/vX.Y.Z/mdp-linux-x86_64
 
 # macOS (aarch64)
 nix store prefetch-file --hash-type sha256 --json \
-  https://github.com/daaa1k/mdpaste/releases/download/vX.Y.Z/mdpaste-macos-aarch64
+  https://github.com/daaa1k/mdp/releases/download/vX.Y.Z/mdp-macos-aarch64
 ```
 
 ## Project structure
@@ -78,7 +78,7 @@ internal/
 ## Configuration priority
 
 ```
-CLI flag --backend > .mdpaste.toml (walks up from CWD) > ~/.config/mdpaste/config.toml > local
+CLI flag --backend > .mdp.toml (walks up from CWD) > ~/.config/mdp/config.toml > local
 ```
 
 ## Environment variables

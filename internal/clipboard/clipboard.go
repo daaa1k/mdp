@@ -89,7 +89,7 @@ func getMacOSFileDropImages() ([]Image, error) {
 }
 
 func getMacOSPngpaste() ([]Image, error) {
-	tmp, err := os.CreateTemp("", "mdpaste-*.png")
+	tmp, err := os.CreateTemp("", "mdp-*.png")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func getMacOSAppleScript() ([]Image, error) {
 	script := `set imgData to the clipboard as «class PNGf»
 do shell script "echo " & (do shell script "printf " & quoted form of (imgData as string) & " | xxd -p | tr -d '\\n'")`
 	// Simpler approach: write via osascript to a temp file.
-	tmp, err := os.CreateTemp("", "mdpaste-*.png")
+	tmp, err := os.CreateTemp("", "mdp-*.png")
 	if err != nil {
 		return nil, err
 	}
