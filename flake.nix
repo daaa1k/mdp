@@ -186,13 +186,16 @@
         '';
 
         # Vet check: runs `go vet ./...` against the source.
+        # Uses mdpaste.goModules (the vendor dir from buildGoModule) so that
+        # network access is not required inside the Nix sandbox.
         vetCheck = pkgs.runCommandLocal "mdpaste-vet"
           { nativeBuildInputs = [ pkgs.go ]; }
           ''
             cp -r ${pkgs.lib.cleanSource ./.} src
             chmod -R u+w src
+            ln -sf ${mdpaste.goModules} src/vendor
             cd src
-            HOME=$TMPDIR go vet ./...
+            HOME=$TMPDIR GOFLAGS=-mod=vendor go vet ./...
             touch $out
           '';
       in
