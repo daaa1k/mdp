@@ -62,7 +62,7 @@ func windowsPath(t *testing.T, linuxPath string) string {
 }
 
 // psQuote wraps a path in PowerShell single quotes, escaping any embedded
-// single quotes ('' is the PowerShell escape sequence).
+// single quotes (” is the PowerShell escape sequence).
 func psQuote(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }
