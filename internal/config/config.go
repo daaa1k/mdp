@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/daaa1k/mdp/internal/xdg"
 	"gopkg.in/yaml.v3"
 )
 
@@ -168,9 +169,9 @@ func loadProjectConfig() (*ProjectConfig, error) {
 	return nil, os.ErrNotExist
 }
 
-// loadGlobalConfig reads the global config file from the OS config directory.
+// loadGlobalConfig reads the global config file from the XDG config directory.
 func loadGlobalConfig() (*GlobalConfig, error) {
-	dir, err := os.UserConfigDir()
+	dir, err := xdg.ConfigDir()
 	if err != nil {
 		return nil, err
 	}
