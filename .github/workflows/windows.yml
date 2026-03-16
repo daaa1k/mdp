@@ -9,6 +9,8 @@ jobs:
   test:
     name: Test (windows-latest)
     runs-on: windows-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v6
