@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -134,6 +135,45 @@ func TestGetWSL2Images_FileDropSingle(t *testing.T) {
 
 	linuxPath := makeTestPNGFile(t)
 	defer os.Remove(linuxPath)
+	winPath := windowsPath(t, linuxPath)
+
+	setWSL2FileDrop(t, ps, []string{winPath})
+
+	imgs, err := getWSL2Images(ps)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(imgs) != 1 {
+		t.Fatalf("expected 1 image, got %d", len(imgs))
+	}
+	if imgs[0].Ext != "png" {
+		t.Errorf("expected ext png, got %s", imgs[0].Ext)
+	}
+	if len(imgs[0].Data) == 0 {
+		t.Error("image data is empty")
+	}
+}
+
+// TestGetWSL2Images_FileDropNonASCII verifies that getWSL2Images handles
+// Windows paths containing non-ASCII characters (e.g. Japanese) correctly.
+// This exercises the [Console]::OutputEncoding=UTF8 fix: without it,
+// PowerShell outputs paths in the system OEM code page (e.g. Shift-JIS on
+// Japanese Windows), which corrupts the path before wslpath sees it.
+func TestGetWSL2Images_FileDropNonASCII(t *testing.T) {
+	skipIfNotWSL2(t)
+	ps := resolvePowerShell("")
+
+	// Create a temp dir with a Japanese name so the full path is non-ASCII.
+	dir, err := os.MkdirTemp("", "mdp-テスト-")
+	if err != nil {
+		t.Fatalf("MkdirTemp: %v", err)
+	}
+	defer os.RemoveAll(dir)
+
+	linuxPath := filepath.Join(dir, "画像.png")
+	if err := os.WriteFile(linuxPath, makeTestPNG(t), 0o644); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
 	winPath := windowsPath(t, linuxPath)
 
 	setWSL2FileDrop(t, ps, []string{winPath})

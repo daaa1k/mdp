@@ -289,10 +289,10 @@ func getWSL2Images(powerShellPath string) ([]Image, error) {
 	ps := resolvePowerShell(powerShellPath)
 
 	// Try file drop list.
-	fileScript := `Add-Type -AssemblyName PresentationCore
-$files = [System.Windows.Clipboard]::GetFileDropList()
-if ($files.Count -gt 0) { $files | ForEach-Object { $_ } }`
-	out, err := runPowerShell(ps, fileScript)
+	// -Sta is required: System.Windows.Forms.Clipboard needs an STA thread.
+	// [Console]::OutputEncoding=UTF8 is required for non-ASCII paths (e.g. Japanese).
+	fileScript := `[Console]::OutputEncoding=[Text.Encoding]::UTF8;Add-Type -Assembly System.Windows.Forms;$files=[System.Windows.Forms.Clipboard]::GetFileDropList();if($files -eq $null -or $files.Count -eq 0){exit 1};foreach($f in $files){Write-Output $f}`
+	out, err := runPowerShellSTA(ps, fileScript)
 	if err == nil && strings.TrimSpace(out) != "" {
 		var imgs []Image
 		for _, winPath := range strings.Split(strings.TrimSpace(out), "\n") {
@@ -347,8 +347,8 @@ if ($img -ne $null) {
 func getWindowsImages(powerShellPath string) ([]Image, error) {
 	ps := resolvePowerShell(powerShellPath)
 
-	fileScript := `[System.Windows.Clipboard]::GetFileDropList() | ForEach-Object { $_ }`
-	out, err := runPowerShell(ps, fileScript)
+	fileScript := `[Console]::OutputEncoding=[Text.Encoding]::UTF8;Add-Type -Assembly System.Windows.Forms;$files=[System.Windows.Forms.Clipboard]::GetFileDropList();if($files -eq $null -or $files.Count -eq 0){exit 1};foreach($f in $files){Write-Output $f}`
+	out, err := runPowerShellSTA(ps, fileScript)
 	if err == nil && strings.TrimSpace(out) != "" {
 		var imgs []Image
 		for _, p := range strings.Split(strings.TrimSpace(out), "\n") {
@@ -417,6 +417,15 @@ func resolvePowerShell(configured string) string {
 
 func runPowerShell(psPath, script string) (string, error) {
 	cmd := exec.Command(psPath, "-NoProfile", "-NonInteractive", "-Command", script)
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+// runPowerShellSTA runs a PowerShell script in STA mode.
+// STA (Single-Threaded Apartment) is required by System.Windows.Forms.Clipboard.
+// Note: -Sta is only supported by powershell.exe (Windows PowerShell), not pwsh.exe (PowerShell Core).
+func runPowerShellSTA(psPath, script string) (string, error) {
+	cmd := exec.Command(psPath, "-Sta", "-NoProfile", "-NonInteractive", "-Command", script)
 	out, err := cmd.Output()
 	return string(out), err
 }
