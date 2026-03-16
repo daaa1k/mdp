@@ -10,7 +10,6 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	"image/png"
-	_ "image/png"
 	"net/url"
 	"os"
 	"os/exec"
@@ -133,10 +132,6 @@ func getMacOSPngpaste() ([]Image, error) {
 }
 
 func getMacOSAppleScript() ([]Image, error) {
-	// Get PNG from clipboard as base64.
-	script := `set imgData to the clipboard as «class PNGf»
-do shell script "echo " & (do shell script "printf " & quoted form of (imgData as string) & " | xxd -p | tr -d '\\n'")`
-	// Simpler approach: write via osascript to a temp file.
 	tmp, err := os.CreateTemp("", "mdp-*.png")
 	if err != nil {
 		return nil, err
@@ -144,7 +139,7 @@ do shell script "echo " & (do shell script "printf " & quoted form of (imgData a
 	tmp.Close()
 	defer os.Remove(tmp.Name())
 
-	script = fmt.Sprintf(`set imgData to the clipboard as «class PNGf»
+	script := fmt.Sprintf(`set imgData to the clipboard as «class PNGf»
 set f to open for access POSIX file %q with write permission
 write imgData to f
 close access f`, tmp.Name())
@@ -203,7 +198,7 @@ func getLinuxWayland() ([]Image, error) {
 		if err != nil {
 			continue
 		}
-		img, err := rawToImage(data, mime)
+		img, err := rawToImage(data)
 		if err != nil {
 			continue
 		}
@@ -221,7 +216,7 @@ func getLinuxX11() ([]Image, error) {
 		if err != nil {
 			continue
 		}
-		img, err := rawToImage(data, mime)
+		img, err := rawToImage(data)
 		if err != nil {
 			continue
 		}
@@ -319,27 +314,7 @@ func getWSL2Images(powerShellPath string) ([]Image, error) {
 		}
 	}
 
-	// Try image from clipboard.
-	imgScript := `Add-Type -AssemblyName System.Windows.Forms
-$img = [System.Windows.Forms.Clipboard]::GetImage()
-if ($img -ne $null) {
-    $ms = New-Object System.IO.MemoryStream
-    $img.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
-    [Convert]::ToBase64String($ms.ToArray())
-}`
-	b64, err := runPowerShell(ps, imgScript)
-	if err != nil || strings.TrimSpace(b64) == "" {
-		return nil, fmt.Errorf("no image in WSL2 clipboard")
-	}
-	pngData, err := base64.StdEncoding.DecodeString(strings.TrimSpace(b64))
-	if err != nil {
-		return nil, err
-	}
-	webpData, err := toWebP(pngData)
-	if err != nil {
-		return nil, err
-	}
-	return []Image{{Data: webpData, Ext: "webp"}}, nil
+	return getPowerShellClipboardImage(ps, "WSL2")
 }
 
 // ─── Windows ─────────────────────────────────────────────────────────────────
@@ -371,6 +346,12 @@ func getWindowsImages(powerShellPath string) ([]Image, error) {
 		}
 	}
 
+	return getPowerShellClipboardImage(ps, "Windows")
+}
+
+// getPowerShellClipboardImage reads the clipboard image via PowerShell and re-encodes it as PNG.
+// platform is used only in the error message.
+func getPowerShellClipboardImage(ps, platform string) ([]Image, error) {
 	imgScript := `Add-Type -AssemblyName System.Windows.Forms
 $img = [System.Windows.Forms.Clipboard]::GetImage()
 if ($img -ne $null) {
@@ -380,7 +361,7 @@ if ($img -ne $null) {
 }`
 	b64, err := runPowerShell(ps, imgScript)
 	if err != nil || strings.TrimSpace(b64) == "" {
-		return nil, fmt.Errorf("no image in Windows clipboard")
+		return nil, fmt.Errorf("no image in %s clipboard", platform)
 	}
 	pngData, err := base64.StdEncoding.DecodeString(strings.TrimSpace(b64))
 	if err != nil {
@@ -438,8 +419,8 @@ func wslPath(winPath string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// rawToImage converts raw image bytes (by MIME type) to a clipboard Image, encoding as PNG (lossless).
-func rawToImage(data []byte, mime string) (Image, error) {
+// rawToImage converts raw image bytes to a clipboard Image, encoding as PNG (lossless).
+func rawToImage(data []byte) (Image, error) {
 	webpData, err := toWebP(data)
 	if err != nil {
 		return Image{}, err

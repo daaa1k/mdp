@@ -103,7 +103,7 @@ func newBackend(cfg *config.Config, debug bool) (backend.Backend, error) {
 		if debug {
 			fmt.Fprintf(os.Stderr, "[debug] saving locally to dir=%s\n", dir)
 		}
-		return &backend.LocalBackend{Dir: dir}, nil
+		return backend.NewLocalBackend(dir), nil
 	}
 }
 

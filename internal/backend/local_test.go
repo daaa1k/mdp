@@ -10,7 +10,7 @@ import (
 
 func TestLocalBackend_Save(t *testing.T) {
 	dir := t.TempDir()
-	b := &LocalBackend{Dir: filepath.Join(dir, "images")}
+	b := NewLocalBackend(filepath.Join(dir, "images"))
 	data := []byte("fake image data")
 
 	url, err := b.Save(context.Background(), data, "test.webp")
@@ -33,7 +33,7 @@ func TestLocalBackend_Save(t *testing.T) {
 
 func TestLocalBackend_SaveNestedDir(t *testing.T) {
 	dir := t.TempDir()
-	b := &LocalBackend{Dir: filepath.Join(dir, "a", "b", "c")}
+	b := NewLocalBackend(filepath.Join(dir, "a", "b", "c"))
 	_, err := b.Save(context.Background(), []byte("x"), "img.png")
 	if err != nil {
 		t.Fatalf("Save nested: %v", err)
@@ -42,7 +42,7 @@ func TestLocalBackend_SaveNestedDir(t *testing.T) {
 
 func TestLocalBackend_URLForwardSlashes(t *testing.T) {
 	dir := t.TempDir()
-	b := &LocalBackend{Dir: filepath.Join(dir, "images")}
+	b := NewLocalBackend(filepath.Join(dir, "images"))
 	url, err := b.Save(context.Background(), []byte("x"), "img.webp")
 	if err != nil {
 		t.Fatalf("Save: %v", err)
