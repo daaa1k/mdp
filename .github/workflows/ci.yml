@@ -48,6 +48,10 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
+        with:
+          determinate: false
+          nix-build-user-count: 4
+          diagnostic-endpoint: ""
 
       - name: Cache Nix store
         uses: nix-community/cache-nix-action@v7
