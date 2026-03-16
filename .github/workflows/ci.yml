@@ -49,6 +49,23 @@ jobs:
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@v30
 
+      - name: Cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock', '**/go.sum') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-
+          purge-last-accessed: P3DT0H
+          purge-primary-key: never
+
+      - name: Set up Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: daaa1k
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          pushFilter: '-source$'
+
       - name: Build
         run: nix build
 
