@@ -49,15 +49,9 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
 
-      - name: Cache Nix store
-        uses: actions/cache@v5
-        with:
-          path: /nix/store
-          # No gc-max-store-size: with a 2G limit GC deleted critical artifacts
-          # causing slower warm-cache builds. Compressed store ≈1GB (Linux) / 700MB (macOS).
-          key: nix2-${{ runner.os }}-${{ hashFiles('flake.lock', 'go.sum') }}
-          restore-keys: |
-            nix2-${{ runner.os }}-
+      # NOTE: actions/cache for /nix/store cannot work here — Nix is installed
+      # first and the daemon owns the store with strict permissions, so gtar
+      # always fails with "Permission denied". Rely on Cachix instead.
 
       - name: Set up Cachix
         uses: cachix/cachix-action@v16
