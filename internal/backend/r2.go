@@ -3,23 +3,26 @@ package backend
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"time"
 )
 
 // R2Backend uploads images to Cloudflare R2 via the S3-compatible API.
 type R2Backend struct {
-	client    *s3.Client
+	endpoint  string
 	Bucket    string
 	PublicURL string
 	Prefix    string
+	accessKey string
+	secretKey string
 }
 
 // NewR2Backend creates an R2Backend using credentials from environment variables
@@ -31,24 +34,13 @@ func NewR2Backend(bucket, publicURL, endpoint, prefix string) (*R2Backend, error
 		return nil, fmt.Errorf("R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY must be set")
 	}
 
-	cfg, err := awsconfig.LoadDefaultConfig(context.Background(),
-		awsconfig.WithRegion("auto"),
-		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("load R2 config: %w", err)
-	}
-
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(endpoint)
-		o.UsePathStyle = true
-	})
-
 	return &R2Backend{
-		client:    client,
+		endpoint:  strings.TrimRight(endpoint, "/"),
 		Bucket:    bucket,
 		PublicURL: publicURL,
 		Prefix:    prefix,
+		accessKey: accessKey,
+		secretKey: secretKey,
 	}, nil
 }
 
@@ -59,17 +51,90 @@ func (b *R2Backend) Save(ctx context.Context, data []byte, filename string) (str
 		key = path.Join(b.Prefix, filename)
 	}
 
-	_, err := b.client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(b.Bucket),
-		Key:         aws.String(key),
-		Body:        bytes.NewReader(data),
-		ContentType: aws.String(mimeType(filename)),
-	})
-	if err != nil {
+	if err := b.putObject(ctx, key, data, mimeType(filename)); err != nil {
 		return "", fmt.Errorf("upload to R2: %w", err)
 	}
 
 	return strings.TrimRight(b.PublicURL, "/") + "/" + key, nil
+}
+
+// putObject sends a single S3 PutObject request signed with AWS Signature Version 4.
+// Only path-style addressing is used, matching Cloudflare R2 requirements.
+func (b *R2Backend) putObject(ctx context.Context, key string, body []byte, contentType string) error {
+	now := time.Now().UTC()
+	dateStr := now.Format("20060102")
+	dateTimeStr := now.Format("20060102T150405Z")
+
+	rawURL := b.endpoint + "/" + b.Bucket + "/" + key
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return err
+	}
+
+	bodyHashBytes := sha256.Sum256(body)
+	bodyHash := hex.EncodeToString(bodyHashBytes[:])
+
+	// Canonical headers must be sorted alphabetically by header name.
+	canonicalHeaders := "content-type:" + contentType + "\n" +
+		"host:" + u.Host + "\n" +
+		"x-amz-content-sha256:" + bodyHash + "\n" +
+		"x-amz-date:" + dateTimeStr + "\n"
+	signedHeaders := "content-type;host;x-amz-content-sha256;x-amz-date"
+
+	canonicalRequest := "PUT\n" +
+		u.EscapedPath() + "\n" +
+		"\n" + // query string (empty)
+		canonicalHeaders + "\n" +
+		signedHeaders + "\n" +
+		bodyHash
+
+	region := "auto" // Cloudflare R2 uses "auto" as the region
+	credentialScope := dateStr + "/" + region + "/s3/aws4_request"
+
+	crHash := sha256.Sum256([]byte(canonicalRequest))
+	stringToSign := "AWS4-HMAC-SHA256\n" +
+		dateTimeStr + "\n" +
+		credentialScope + "\n" +
+		hex.EncodeToString(crHash[:])
+
+	signingKey := hmacSHA256(
+		hmacSHA256(
+			hmacSHA256(
+				hmacSHA256([]byte("AWS4"+b.secretKey), []byte(dateStr)),
+				[]byte(region)),
+			[]byte("s3")),
+		[]byte("aws4_request"))
+
+	signature := hex.EncodeToString(hmacSHA256(signingKey, []byte(stringToSign)))
+	authHeader := "AWS4-HMAC-SHA256 Credential=" + b.accessKey + "/" + credentialScope +
+		",SignedHeaders=" + signedHeaders +
+		",Signature=" + signature
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, rawURL, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", contentType)
+	req.Header.Set("X-Amz-Content-Sha256", bodyHash)
+	req.Header.Set("X-Amz-Date", dateTimeStr)
+	req.Header.Set("Authorization", authHeader)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("R2 upload failed: %s", resp.Status)
+	}
+	return nil
+}
+
+func hmacSHA256(key, data []byte) []byte {
+	mac := hmac.New(sha256.New, key)
+	mac.Write(data)
+	return mac.Sum(nil)
 }
 
 // mimeType returns the MIME type for a filename based on its extension.
