@@ -49,9 +49,15 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
 
-      # NOTE: actions/cache for /nix/store cannot work here — Nix is installed
-      # first and the daemon owns the store with strict permissions, so gtar
-      # always fails with "Permission denied". Rely on Cachix instead.
+      - name: Cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-
+          purge-last-accessed: P3DT0H
+          purge-primary-key: never
 
       - name: Set up Cachix
         uses: cachix/cachix-action@v16
