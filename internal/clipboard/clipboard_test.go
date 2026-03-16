@@ -126,7 +126,7 @@ func TestToWebP_EmptyData(t *testing.T) {
 // ─── rawToImage ───────────────────────────────────────────────────────────────
 
 func TestRawToImage_PNG(t *testing.T) {
-	img, err := rawToImage(makeTestPNG(t), "image/png")
+	img, err := rawToImage(makeTestPNG(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,7 +147,7 @@ func TestRawToImage_PNG(t *testing.T) {
 }
 
 func TestRawToImage_InvalidData(t *testing.T) {
-	_, err := rawToImage([]byte("garbage"), "image/png")
+	_, err := rawToImage([]byte("garbage"))
 	if err == nil {
 		t.Error("expected error for invalid data")
 	}

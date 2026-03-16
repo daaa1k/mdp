@@ -18,9 +18,9 @@ import (
 // R2Backend uploads images to Cloudflare R2 via the S3-compatible API.
 type R2Backend struct {
 	endpoint  string
-	Bucket    string
-	PublicURL string
-	Prefix    string
+	bucket    string
+	publicURL string
+	prefix    string
 	accessKey string
 	secretKey string
 }
@@ -36,9 +36,9 @@ func NewR2Backend(bucket, publicURL, endpoint, prefix string) (*R2Backend, error
 
 	return &R2Backend{
 		endpoint:  strings.TrimRight(endpoint, "/"),
-		Bucket:    bucket,
-		PublicURL: publicURL,
-		Prefix:    prefix,
+		bucket:    bucket,
+		publicURL: publicURL,
+		prefix:    prefix,
 		accessKey: accessKey,
 		secretKey: secretKey,
 	}, nil
@@ -47,15 +47,15 @@ func NewR2Backend(bucket, publicURL, endpoint, prefix string) (*R2Backend, error
 // Save uploads data to R2 and returns the public URL of the uploaded object.
 func (b *R2Backend) Save(ctx context.Context, data []byte, filename string) (string, error) {
 	key := filename
-	if b.Prefix != "" {
-		key = path.Join(b.Prefix, filename)
+	if b.prefix != "" {
+		key = path.Join(b.prefix, filename)
 	}
 
 	if err := b.putObject(ctx, key, data, mimeType(filename)); err != nil {
 		return "", fmt.Errorf("upload to R2: %w", err)
 	}
 
-	return strings.TrimRight(b.PublicURL, "/") + "/" + key, nil
+	return strings.TrimRight(b.publicURL, "/") + "/" + key, nil
 }
 
 // putObject sends a single S3 PutObject request signed with AWS Signature Version 4.
@@ -65,7 +65,7 @@ func (b *R2Backend) putObject(ctx context.Context, key string, body []byte, cont
 	dateStr := now.Format("20060102")
 	dateTimeStr := now.Format("20060102T150405Z")
 
-	rawURL := b.endpoint + "/" + b.Bucket + "/" + key
+	rawURL := b.endpoint + "/" + b.bucket + "/" + key
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return err

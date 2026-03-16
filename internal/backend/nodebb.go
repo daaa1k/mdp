@@ -20,7 +20,7 @@ import (
 
 // NodeBBBackend uploads images to a NodeBB forum instance.
 type NodeBBBackend struct {
-	BaseURL    string
+	baseURL    string
 	client     *http.Client
 	jar        *cookiejar.Jar
 	cookieFile string
@@ -33,7 +33,7 @@ func NewNodeBBBackend(baseURL string) (*NodeBBBackend, error) {
 		return nil, err
 	}
 	b := &NodeBBBackend{
-		BaseURL: strings.TrimRight(baseURL, "/"),
+		baseURL: strings.TrimRight(baseURL, "/"),
 		client: &http.Client{
 			Jar:     jar,
 			Timeout: 30 * time.Second,
@@ -46,89 +46,69 @@ func NewNodeBBBackend(baseURL string) (*NodeBBBackend, error) {
 	return b, nil
 }
 
+// apiConfig holds the fields we read from NodeBB's /api/config endpoint.
+type apiConfig struct {
+	UID       float64 `json:"uid"`
+	CSRFToken string  `json:"csrf_token"`
+}
+
+// fetchAPIConfig calls /api/config and returns uid + csrf_token.
+func (b *NodeBBBackend) fetchAPIConfig(ctx context.Context) (*apiConfig, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.baseURL+"/api/config", nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := b.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var cfg apiConfig
+	if err := json.NewDecoder(resp.Body).Decode(&cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
 // Save authenticates (if needed) and uploads an image to NodeBB, returning the URL.
 func (b *NodeBBBackend) Save(ctx context.Context, data []byte, filename string) (string, error) {
-	if !b.isSessionValid(ctx) {
-		if err := b.login(ctx); err != nil {
+	cfg, err := b.fetchAPIConfig(ctx)
+	if err != nil {
+		return "", fmt.Errorf("get api config: %w", err)
+	}
+
+	if cfg.UID == 0 {
+		if err := b.login(ctx, cfg.CSRFToken); err != nil {
 			return "", fmt.Errorf("nodebb login: %w", err)
 		}
 		_ = b.saveCookies()
+		// Re-fetch to get fresh CSRF token for the upload.
+		cfg, err = b.fetchAPIConfig(ctx)
+		if err != nil {
+			return "", fmt.Errorf("get api config after login: %w", err)
+		}
 	}
 
-	csrfToken, err := b.getCSRFToken(ctx)
-	if err != nil {
-		return "", fmt.Errorf("get csrf token: %w", err)
-	}
-
-	imageURL, err := b.upload(ctx, data, filename, csrfToken)
+	imageURL, err := b.upload(ctx, data, filename, cfg.CSRFToken)
 	if err != nil {
 		return "", fmt.Errorf("nodebb upload: %w", err)
 	}
 	return imageURL, nil
 }
 
-// isSessionValid calls /api/config and checks uid > 0.
-func (b *NodeBBBackend) isSessionValid(ctx context.Context) bool {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.BaseURL+"/api/config", nil)
-	if err != nil {
-		return false
-	}
-	resp, err := b.client.Do(req)
-	if err != nil {
-		return false
-	}
-	defer resp.Body.Close()
-	var result map[string]any
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false
-	}
-	if uid, ok := result["uid"]; ok {
-		if v, ok := uid.(float64); ok {
-			return v > 0
-		}
-	}
-	return false
-}
-
-// getCSRFToken fetches the CSRF token from /api/config.
-func (b *NodeBBBackend) getCSRFToken(ctx context.Context) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.BaseURL+"/api/config", nil)
-	if err != nil {
-		return "", err
-	}
-	resp, err := b.client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	var result map[string]any
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", err
-	}
-	if token, ok := result["csrf_token"].(string); ok {
-		return token, nil
-	}
-	return "", fmt.Errorf("csrf_token not found in /api/config")
-}
-
 // login authenticates using NODEBB_USERNAME and NODEBB_PASSWORD env vars.
-func (b *NodeBBBackend) login(ctx context.Context) error {
+func (b *NodeBBBackend) login(ctx context.Context, csrfToken string) error {
 	username := os.Getenv("NODEBB_USERNAME")
 	password := os.Getenv("NODEBB_PASSWORD")
 	if username == "" || password == "" {
 		return fmt.Errorf("NODEBB_USERNAME and NODEBB_PASSWORD must be set")
 	}
 
-	csrfToken, err := b.getCSRFToken(ctx)
-	if err != nil {
-		return err
-	}
-
 	form := url.Values{
 		"username": {username},
 		"password": {password},
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.BaseURL+"/api/v3/utilities/login", strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.baseURL+"/api/v3/utilities/login", strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
@@ -160,7 +140,7 @@ func (b *NodeBBBackend) upload(ctx context.Context, data []byte, filename, csrfT
 	}
 	w.Close()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.BaseURL+"/api/post/upload", &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.baseURL+"/api/post/upload", &buf)
 	if err != nil {
 		return "", err
 	}
@@ -180,7 +160,7 @@ func (b *NodeBBBackend) upload(ctx context.Context, data []byte, filename, csrfT
 		return "", fmt.Errorf("upload failed (%d): %s", resp.StatusCode, body)
 	}
 
-	return parseUploadResponse(body, b.BaseURL)
+	return parseUploadResponse(body, b.baseURL)
 }
 
 // parseUploadResponse handles both NodeBB v3 and legacy response formats.
@@ -253,7 +233,7 @@ func (b *NodeBBBackend) saveCookies() error {
 	if b.cookieFile == "" {
 		return nil
 	}
-	u, err := url.Parse(b.BaseURL)
+	u, err := url.Parse(b.baseURL)
 	if err != nil {
 		return err
 	}
@@ -295,7 +275,7 @@ func (b *NodeBBBackend) loadCookies() error {
 	if err := json.Unmarshal(data, &entries); err != nil {
 		return err
 	}
-	u, err := url.Parse(b.BaseURL)
+	u, err := url.Parse(b.baseURL)
 	if err != nil {
 		return err
 	}
