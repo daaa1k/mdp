@@ -25,6 +25,12 @@ jobs:
               --title "${{ github.ref_name }}"
           fi
 
+      - name: Upload license files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.ref_name }}" LICENSE NOTICE --clobber
+
   build:
     name: Build (${{ matrix.target }})
     needs: create-release
