@@ -1,13 +1,13 @@
 class Mdp < Formula
   desc "Paste clipboard image as Markdown link"
   homepage "https://github.com/daaa1k/mdp"
-  version "0.2.2"
+  version "0.2.3"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/daaa1k/mdp/releases/download/v#{version}/mdp-macos-aarch64"
-      sha256 "3e0a61c00690e06a42ff56648c9106f438942c5d8727fde65c336eeec9b314c5" # macos-aarch64
+      sha256 "8fb87e1251a5b59bd6d37dd82be8121d36a91c94f78c9a4b3c999e24fba8c357" # macos-aarch64
 
       def install
         bin.install "mdp-macos-aarch64" => "mdp"
@@ -24,7 +24,7 @@ class Mdp < Formula
 
   on_linux do
     url "https://github.com/daaa1k/mdp/releases/download/v#{version}/mdp-linux-x86_64"
-    sha256 "ff466ad301ad9df1dd7e085fcd3257a3c2a4c4667d3383b8c2568d332c7f81d0" # linux-x86_64
+    sha256 "87a7359718512eb72d9688895a23b10905efdcf56320ec6aa544b849908e109b" # linux-x86_64
 
     def install
       bin.install "mdp-linux-x86_64" => "mdp"
