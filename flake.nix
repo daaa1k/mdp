@@ -15,8 +15,8 @@
       # Update these whenever a new version is released:
       #   nix store prefetch-file --hash-type sha256 --json <url>
       binaryHashes = {
-        "x86_64-linux" = "sha256-/0Zq0wGtnfHdfghfzTJXo8KkxGZ9M4O4wlaNMyx/gdA=";
-        "aarch64-darwin" = "sha256-PgphwAaQ4GpC/1ZkjJEG9DiULF2HJ/3mXDNu7smzFMU=";
+        "x86_64-linux" = "sha256-h6c1lxhRLrctloiJWiOxCQXv3PVjIOxqpUS4SZCOEJs=";
+        "aarch64-darwin" = "sha256-j7h+ElGltZvW033YK+gSHTapHJT3jJpLPJmeJPuow1c=";
       };
 
       # Map Nix system strings to GitHub Release artifact names.
