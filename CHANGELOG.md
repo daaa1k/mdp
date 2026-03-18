@@ -3,6 +3,9 @@
 ## [v0.2.4](https://github.com/daaa1k/mdp/compare/v0.2.3...v0.2.4) - 2026-03-18
 - fix ci by @daaa1k in https://github.com/daaa1k/mdp/pull/18
 
+## [v0.2.4](https://github.com/daaa1k/mdp/compare/v0.2.3...v0.2.4) - 2026-03-18
+- fix ci by @daaa1k in https://github.com/daaa1k/mdp/pull/18
+
 ## [v0.2.3](https://github.com/daaa1k/mdp/compare/v0.2.2...v0.2.3) - 2026-03-17
 - ci: add nix-community/cache-nix-action@v7 for Nix store caching by @daaa1k in https://github.com/daaa1k/mdp/pull/16
 - Add NOTICE file and include licenses in release artifacts by @daaa1k in https://github.com/daaa1k/mdp/pull/17
