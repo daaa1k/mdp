@@ -19,8 +19,8 @@
     #   nix store prefetch-file --hash-type sha256 --json <url>
     # Leave as "" to disable the mdp-bin package for that platform.
     binaryHashes = {
-      "x86_64-linux" = "sha256-bUOA2xlmiRWC/ozzvgU/z1gx8Pqmpp0jhkHbplB+Z1Y=";
-      "aarch64-darwin" = "sha256-jiz1N5AqrKz5DknultgOixh0tRim0xQbiEK3MHLmbk0=";
+      "x86_64-linux" = "sha256-1p03vKhrh0B56kkoaWtRAzl6Dr5qpmvJEDrB0iHkXMY=";
+      "aarch64-darwin" = "sha256-UirA08IBQQu8bRkVAnXqalIzQsx2zBq3lo8fM4zK1GI=";
     };
 
     # Map Nix system strings to GitHub Release artifact names.
