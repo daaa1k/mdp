@@ -35,5 +35,4 @@ jobs:
           format: 'table'
           exit-code: '1'
           severity: 'UNKNOWN,MEDIUM,HIGH'
-        env:
-          TRIVY_LICENSE_FULL: 'true'
+          trivy-config: trivy.yaml
