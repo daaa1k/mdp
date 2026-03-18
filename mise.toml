@@ -37,7 +37,6 @@ depends = ["fmt-check", "lint", "test"]
 description = "Run all CI checks"
 
 [tasks.credits]
-depends = ["credits"]
 run = """
 go install github.com/Songmu/gocredits/cmd/gocredits@latest
 go mod download
