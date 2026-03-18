@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.6](https://github.com/daaa1k/mdp/compare/v0.2.5...v0.2.6) - 2026-03-18
+- chore: add credits ignore by @daaa1k in https://github.com/daaa1k/mdp/pull/23
+
 ## [v0.2.5](https://github.com/daaa1k/mdp/compare/v0.2.4...v0.2.5) - 2026-03-18
 - Remove circular dependency in credits task by @daaa1k in https://github.com/daaa1k/mdp/pull/21
 
