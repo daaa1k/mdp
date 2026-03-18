@@ -40,7 +40,7 @@ description = "Run all CI checks"
 run = """
 go install github.com/Songmu/gocredits/cmd/gocredits@latest
 go mod download
-gocredits -w .
+gocredits -skip-missing -w .
 """
 
 [tasks.prerelease-for-tagpr]
