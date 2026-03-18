@@ -103,7 +103,7 @@ mdp --debug
 
 | Platform | Clipboard method |
 |---|---|
-| macOS | pngpaste (recommended), AppleScript fallback |
+| macOS | AppleScript (file drop), pngpaste, AppleScript fallback |
 | Linux (Wayland) | wl-paste |
 | Linux (X11) | xclip |
 | WSL2 | PowerShell via interop |
