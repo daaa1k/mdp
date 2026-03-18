@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.8](https://github.com/daaa1k/mdp/compare/v0.2.7...v0.2.8) - 2026-03-18
+- Add YAML configuration file support for mdp by @daaa1k in https://github.com/daaa1k/mdp/pull/29
+
 ## [v0.2.7](https://github.com/daaa1k/mdp/compare/v0.2.6...v0.2.7) - 2026-03-18
 - chore: add CREDITS by @daaa1k in https://github.com/daaa1k/mdp/pull/27
 
