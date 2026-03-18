@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.7](https://github.com/daaa1k/mdp/compare/v0.2.6...v0.2.7) - 2026-03-18
+- chore: add CREDITS by @daaa1k in https://github.com/daaa1k/mdp/pull/27
+
 ## [v0.2.6](https://github.com/daaa1k/mdp/compare/v0.2.5...v0.2.6) - 2026-03-18
 - chore: add credits ignore by @daaa1k in https://github.com/daaa1k/mdp/pull/23
 
