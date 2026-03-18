@@ -83,6 +83,7 @@
       ...
     }: let
       cfg = config.programs.mdp;
+      settingsFormat = pkgs.formats.yaml {};
     in {
       options.programs.mdp = {
         enable = lib.mkEnableOption "mdp";
@@ -100,11 +101,40 @@
               (faster setup; no Go compilation required; supports x86_64-linux and aarch64-darwin)
           '';
         };
+
+        settings = lib.mkOption {
+          type = settingsFormat.type;
+          default = {};
+          description = ''
+            Configuration written to <filename>$XDG_CONFIG_HOME/mdp/config.yaml</filename>.
+
+            Available top-level keys mirror the YAML config format:
+            - `backend` — storage backend: `"local"`, `"r2"`, or `"nodebb"`
+            - `local.dir` — directory for local backend
+            - `r2.bucket`, `r2.public_url`, `r2.endpoint`, `r2.account_id`, `r2.prefix` — R2 settings
+            - `nodebb.url` — NodeBB forum URL
+            - `powershell_path` — WSL2: path to powershell.exe
+          '';
+          example = lib.literalExpression ''
+            {
+              backend = "r2";
+              r2 = {
+                bucket = "my-bucket";
+                public_url = "https://cdn.example.com";
+                account_id = "abc123";
+              };
+            }
+          '';
+        };
       };
 
-      config = lib.mkIf cfg.enable {
-        home.packages = [cfg.package];
-      };
+      config = lib.mkIf cfg.enable (lib.mkMerge [
+        { home.packages = [cfg.package]; }
+        (lib.mkIf (cfg.settings != {}) {
+          xdg.configFile."mdp/config.yaml".source =
+            settingsFormat.generate "mdp-config.yaml" cfg.settings;
+        })
+      ]);
     };
   in
     flake-utils.lib.eachDefaultSystem (
