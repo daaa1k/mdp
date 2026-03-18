@@ -86,7 +86,7 @@ func nodeBBServer(t *testing.T, loggedIn bool) (*httptest.Server, *struct{ Login
 			if loggedIn || configCallCount > 1 {
 				uid = 42.0
 			}
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{ //nolint:gosec // test-only token
 				"uid":        uid,
 				"csrf_token": "csrf-token-test",
 			})
@@ -98,8 +98,8 @@ func nodeBBServer(t *testing.T, loggedIn bool) (*httptest.Server, *struct{ Login
 		case r.Method == http.MethodPost && r.URL.Path == "/api/post/upload":
 			counters.UploadCalls++
 			// Drain the multipart body.
-			io.Copy(io.Discard, r.Body)
-			json.NewEncoder(w).Encode(map[string]any{
+			_, _ = io.Copy(io.Discard, r.Body)
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"response": map[string]any{
 					"images": []any{
 						map[string]any{"url": "/assets/uploads/result.png"},
@@ -195,12 +195,12 @@ func TestNodeBBBackend_Save_UploadError(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/config":
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"uid":        42.0,
 				"csrf_token": "csrf",
 			})
 		case r.Method == http.MethodPost && r.URL.Path == "/api/post/upload":
-			io.Copy(io.Discard, r.Body)
+			_, _ = io.Copy(io.Discard, r.Body)
 			http.Error(w, `{"error":"internal server error"}`, http.StatusInternalServerError)
 		default:
 			http.NotFound(w, r)

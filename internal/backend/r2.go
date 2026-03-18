@@ -123,7 +123,7 @@ func (b *R2Backend) putObject(ctx context.Context, key string, body []byte, cont
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("R2 upload failed: %s", resp.Status)

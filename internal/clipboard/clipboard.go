@@ -114,8 +114,8 @@ func getMacOSPngpaste() ([]Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	tmp.Close()
-	defer os.Remove(tmp.Name())
+	_ = tmp.Close()
+	defer func() { _ = os.Remove(tmp.Name()) }()
 
 	if err := exec.Command("pngpaste", tmp.Name()).Run(); err != nil {
 		return nil, err
@@ -136,8 +136,8 @@ func getMacOSAppleScript() ([]Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	tmp.Close()
-	defer os.Remove(tmp.Name())
+	_ = tmp.Close()
+	defer func() { _ = os.Remove(tmp.Name()) }()
 
 	script := fmt.Sprintf(`set imgData to the clipboard as «class PNGf»
 set f to open for access POSIX file %q with write permission

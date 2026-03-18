@@ -62,7 +62,7 @@ func (b *NodeBBBackend) fetchAPIConfig(ctx context.Context) (*apiConfig, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var cfg apiConfig
 	if err := json.NewDecoder(resp.Body).Decode(&cfg); err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (b *NodeBBBackend) login(ctx context.Context, csrfToken string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("login failed (%d): %s", resp.StatusCode, body)
@@ -138,7 +138,9 @@ func (b *NodeBBBackend) upload(ctx context.Context, data []byte, filename, csrfT
 	if _, err := fw.Write(data); err != nil {
 		return "", err
 	}
-	w.Close()
+	if err := w.Close(); err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.baseURL+"/api/post/upload", &buf)
 	if err != nil {
@@ -151,7 +153,7 @@ func (b *NodeBBBackend) upload(ctx context.Context, data []byte, filename, csrfT
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err

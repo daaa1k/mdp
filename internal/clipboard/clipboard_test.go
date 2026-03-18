@@ -36,7 +36,7 @@ func makeTestPNGFile(t *testing.T) string {
 	if _, err := f.Write(makeTestPNG(t)); err != nil {
 		t.Fatal(err)
 	}
-	f.Close()
+	_ = f.Close()
 	return f.Name()
 }
 

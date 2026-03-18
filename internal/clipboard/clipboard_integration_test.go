@@ -64,7 +64,7 @@ func TestLinuxWayland_FileDropSingle(t *testing.T) {
 	skipIfNoWayland(t)
 
 	path := makeTestPNGFile(t)
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	uriList := "file://" + path + "\r\n"
 	setWaylandClipboard(t, []byte(uriList), "text/uri-list")
@@ -91,8 +91,8 @@ func TestLinuxWayland_FileDropMultiple(t *testing.T) {
 
 	path1 := makeTestPNGFile(t)
 	path2 := makeTestPNGFile(t)
-	defer os.Remove(path1)
-	defer os.Remove(path2)
+	defer func() { _ = os.Remove(path1) }()
+	defer func() { _ = os.Remove(path2) }()
 
 	uriList := "file://" + path1 + "\r\nfile://" + path2 + "\r\n"
 	setWaylandClipboard(t, []byte(uriList), "text/uri-list")
@@ -164,7 +164,7 @@ func TestLinuxX11_FileDropSingle(t *testing.T) {
 	skipIfNoX11(t)
 
 	path := makeTestPNGFile(t)
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	uriList := "file://" + path + "\r\n"
 	setX11Clipboard(t, []byte(uriList), "text/uri-list")
@@ -188,8 +188,8 @@ func TestLinuxX11_FileDropMultiple(t *testing.T) {
 
 	path1 := makeTestPNGFile(t)
 	path2 := makeTestPNGFile(t)
-	defer os.Remove(path1)
-	defer os.Remove(path2)
+	defer func() { _ = os.Remove(path1) }()
+	defer func() { _ = os.Remove(path2) }()
 
 	uriList := strings.Join([]string{
 		"file://" + path1,

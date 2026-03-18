@@ -53,13 +53,18 @@ func TestEffectiveLocalDir_FromProject(t *testing.T) {
 func TestLoadProjectConfig_FindsFile(t *testing.T) {
 	dir := t.TempDir()
 	content := "backend: r2\nr2:\n  bucket: my-bucket\n  public_url: https://cdn.example.com\n"
-	if err := os.WriteFile(filepath.Join(dir, ".mdp.yaml"), []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, ".mdp.yaml"), []byte(content), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	// Change to temp dir for loading.
-	orig, _ := os.Getwd()
-	defer os.Chdir(orig)
-	os.Chdir(dir)
+	orig, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Chdir(orig) }()
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
 
 	cfg, err := loadProjectConfig()
 	if err != nil {
