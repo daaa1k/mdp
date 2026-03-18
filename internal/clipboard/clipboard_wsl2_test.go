@@ -134,7 +134,7 @@ func TestGetWSL2Images_FileDropSingle(t *testing.T) {
 	ps := resolvePowerShell("")
 
 	linuxPath := makeTestPNGFile(t)
-	defer os.Remove(linuxPath)
+	defer func() { _ = os.Remove(linuxPath) }()
 	winPath := windowsPath(t, linuxPath)
 
 	setWSL2FileDrop(t, ps, []string{winPath})
@@ -168,10 +168,10 @@ func TestGetWSL2Images_FileDropNonASCII(t *testing.T) {
 	if err != nil {
 		t.Fatalf("MkdirTemp: %v", err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 
 	linuxPath := filepath.Join(dir, "画像.png")
-	if err := os.WriteFile(linuxPath, makeTestPNG(t), 0o644); err != nil {
+	if err := os.WriteFile(linuxPath, makeTestPNG(t), 0o600); err != nil {
 		t.Fatalf("WriteFile: %v", err)
 	}
 	winPath := windowsPath(t, linuxPath)
@@ -201,8 +201,8 @@ func TestGetWSL2Images_FileDropMultiple(t *testing.T) {
 
 	linuxPath1 := makeTestPNGFile(t)
 	linuxPath2 := makeTestPNGFile(t)
-	defer os.Remove(linuxPath1)
-	defer os.Remove(linuxPath2)
+	defer func() { _ = os.Remove(linuxPath1) }()
+	defer func() { _ = os.Remove(linuxPath2) }()
 
 	winPath1 := windowsPath(t, linuxPath1)
 	winPath2 := windowsPath(t, linuxPath2)
