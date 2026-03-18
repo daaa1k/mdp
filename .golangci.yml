@@ -1,0 +1,32 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errorlint
+    - godot
+    - gosec
+    - misspell
+    - revive
+    - copyloopvar
+    - intrange
+  settings:
+    misspell:
+      locale: US
+    gosec:
+      # CLI tool: reading user-provided config paths and exec are intentional.
+      excludes:
+        - G204
+        - G304
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - godot
