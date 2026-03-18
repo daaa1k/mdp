@@ -8,6 +8,6 @@ Only the latest version is supported with security updates.
 
 Please do not report security vulnerabilities through public GitHub issues.
 
-Instead, please report a vulnerability through [GitHub's security advisory feature](https://github.com/daaa1k/mdp/security/advisories/new).
+Instead, please report a vulnerability through [GitHub's security advisory feature](../../security/advisories/new).
 
 We will provide an initial response within a few days. If you do not receive a response within that timeframe, please follow up to ensure we received your report.

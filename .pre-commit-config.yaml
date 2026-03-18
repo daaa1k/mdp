@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        language: system
+        entry: mise run fmt
+        types: [go]
+        pass_filenames: false
+
+      - id: go-lint
+        name: go lint
+        language: system
+        entry: mise run lint
+        types: [go]
+        pass_filenames: false

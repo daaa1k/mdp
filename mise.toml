@@ -1,3 +1,51 @@
 [tools]
-go = "latest"
-prek = "latest"
+go = "1.26.0"
+golangci-lint = "v2.11.3"
+pinact = "3.9.0"
+prek = "0.3.3"
+
+[tasks.test]
+run = "go test ./... -coverprofile=coverage.out -covermode=count -count=1"
+description = "Run tests"
+
+[tasks.lint]
+run = ["golangci-lint run ./...", "go vet ./..."]
+description = "Run lint"
+
+[tasks.fmt]
+run = "gofmt -w ."
+description = "Run formatting"
+
+[tasks.fmt-check]
+run = """
+#!/usr/bin/env bash
+output=$(gofmt -l .)
+if [ -n "$output" ]; then
+  printf '%s\n' "$output"
+  echo 'Run: mise run fmt'
+  exit 1
+fi
+"""
+description = "Run formatting check"
+
+[tasks.build]
+run = "go build -o mdp ."
+description = "Build binary"
+
+[tasks.ci]
+depends = ["fmt-check", "lint", "test"]
+description = "Run all CI checks"
+
+[tasks.credits]
+depends = ["credits"]
+run = """
+go install github.com/Songmu/gocredits/cmd/gocredits@latest
+go mod download
+gocredits -w .
+"""
+
+[tasks.prerelease-for-tagpr]
+depends = ["credits"]
+run = """
+git add CHANGELOG.md CREDITS go.mod go.sum
+"""

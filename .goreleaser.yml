@@ -1,0 +1,58 @@
+version: 2
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    flags:
+      - -trimpath
+
+archives:
+  # Raw binary for Nix flake.nix (fetchurl + dontUnpack = true)
+  - id: raw
+    format: binary
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+  # Archives for Homebrew and general distribution
+  - id: archive
+    ids: []
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - CREDITS
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+# Homebrew tap auto-update
+brews:
+  - ids: [archive]
+    repository:
+      owner: daaa1k
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/daaa1k/mdp"
+    description: "Paste clipboard image as Markdown link"
+    license: "MIT"
+    directory: Formula
+    test: |
+      system "#{bin}/mdp", "--help"
+    install: |
+      bin.install "mdp"

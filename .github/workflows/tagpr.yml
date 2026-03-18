@@ -1,0 +1,100 @@
+name: tagpr
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  tagpr:
+    runs-on: ubuntu-latest
+    outputs:
+      tagpr-tag: ${{ steps.run-tagpr.outputs.tag }}
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+      issues: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup mise
+        uses: jdx/mise-action@c1ecc8f748cd28cdeabf76dab3cccde4ce692fe4 # v4.0.0
+
+      - id: run-tagpr
+        name: Run tagpr
+        uses: Songmu/tagpr@b3fb89424646b06c8aa460f50307c60b6a541425 # v1.17.1
+
+  assets:
+    needs: tagpr
+    if: needs.tagpr.outputs.tagpr-tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup mise
+        uses: jdx/mise-action@c1ecc8f748cd28cdeabf76dab3cccde4ce692fe4 # v4.0.0
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 # v7.0.0
+        with:
+          distribution: goreleaser
+          version: latest
+          args: --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+
+  update-nix-hashes:
+    name: Update Nix binary hashes
+    needs: [tagpr, assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Fetch binary hashes and update flake.nix
+        env:
+          VERSION: ${{ needs.tagpr.outputs.tagpr-tag }}
+        run: |
+          BASE="https://github.com/daaa1k/mdp/releases/download/${VERSION}"
+          # Use checksums.txt (already computed by goreleaser) instead of re-downloading binaries.
+          # Convert hex SHA256 → SRI format (sha256-<base64>) required by Nix fetchurl's `hash` attribute.
+          CHECKSUMS=$(curl -fsSL "${BASE}/checksums.txt")
+          LINUX_HASH=$(echo "$CHECKSUMS" | awk '/mdp-linux-amd64$/{print $1}' | xxd -r -p | base64 -w0 | sed 's/^/sha256-/')
+          MACOS_HASH=$(echo "$CHECKSUMS"  | awk '/mdp-darwin-arm64$/{print $1}' | xxd -r -p | base64 -w0 | sed 's/^/sha256-/')
+          echo "linux amd64: $LINUX_HASH"
+          echo "darwin arm64: $MACOS_HASH"
+          # Update only the binaryHashes block (not binaryArtifacts).
+          # Matches the second quoted string on each line (the value, not the key) within the block.
+          awk -v linux="$LINUX_HASH" -v macos="$MACOS_HASH" '
+            /binaryHashes = \{/ { in_hashes=1 }
+            in_hashes && /\};/ { in_hashes=0 }
+            in_hashes && /"x86_64-linux"/   { sub(/"[^"]*";/, "\"" linux "\";") }
+            in_hashes && /"aarch64-darwin"/ { sub(/"[^"]*";/, "\"" macos "\";") }
+            { print }
+          ' flake.nix > flake.nix.tmp && mv flake.nix.tmp flake.nix
+
+      - name: Commit updated flake.nix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.nix
+          git diff --staged --quiet || git commit -m "chore(nix): update binary hashes for ${{ needs.tagpr.outputs.tagpr-tag }}"
+          git push origin main
