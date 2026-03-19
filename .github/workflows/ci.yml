@@ -49,18 +49,5 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           pushFilter: '-source$'
 
-      - name: Cache Nix store
-        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2
-        with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock', '**/go.sum') }}
-          restore-prefixes-first-match: nix-${{ runner.os }}-
-          purge: true
-          purge-prefixes: nix-${{ runner.os }}-
-          purge-last-accessed: P3DT0H
-          purge-primary-key: never
-
-      - name: Build
-        run: nix build
-
       - name: Flake check
         run: nix flake check
