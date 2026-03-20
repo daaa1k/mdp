@@ -9,7 +9,7 @@ Reads an image from the clipboard, saves it to the configured backend, and print
 ### Homebrew (macOS / Linux)
 
 ```sh
-brew install daaa1k/tap/mdp
+brew install --cask daaa1k/tap/mdp
 ```
 
 ### Go install

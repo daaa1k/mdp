@@ -16,7 +16,7 @@ builds:
 archives:
   # Raw binary for Nix flake.nix (fetchurl + dontUnpack = true)
   - id: raw
-    format: binary
+    formats: [binary]
     name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
   # Archives for Homebrew and general distribution
   - id: archive
@@ -24,7 +24,7 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     files:
       - LICENSE
       - CREDITS
@@ -42,7 +42,7 @@ changelog:
       - "^test:"
 
 # Homebrew tap auto-update
-brews:
+homebrew_casks:
   - ids: [archive]
     repository:
       owner: daaa1k
@@ -51,8 +51,12 @@ brews:
     homepage: "https://github.com/daaa1k/mdp"
     description: "Paste clipboard image as Markdown link"
     license: "MIT"
-    directory: Formula
-    test: |
-      system "#{bin}/mdp", "--help"
-    install: |
-      bin.install "mdp"
+    directory: Casks
+    binaries:
+      - mdp
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mdp"]
+          end
