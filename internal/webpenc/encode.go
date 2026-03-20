@@ -110,7 +110,7 @@ func emit(bw *bitWriter, c huffCode) {
 func writeRIFF(w io.Writer, vp8l []byte) error {
 	pad := len(vp8l) & 1
 	fileSize := uint32(4 + 8 + len(vp8l) + pad) //nolint:gosec // bounded by 16384*16384*4+overhead, fits uint32
-	chunkSize := uint32(len(vp8l))               //nolint:gosec // same bound
+	chunkSize := uint32(len(vp8l))              //nolint:gosec // same bound
 
 	var buf bytes.Buffer
 	buf.Grow(8 + int(fileSize))
@@ -261,8 +261,8 @@ func (h hheap) Less(i, j int) bool {
 	}
 	return h[i].sym < h[j].sym
 }
-func (h hheap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *hheap) Push(x any) { *h = append(*h, x.(*hnode)) }
+func (h hheap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+func (h *hheap) Push(x any)   { *h = append(*h, x.(*hnode)) }
 func (h *hheap) Pop() any {
 	old := *h
 	n := len(old)
@@ -337,7 +337,7 @@ func canonicalCodes(lengths []uint) []huffCode {
 	nextCode := make([]uint32, maxLen+1)
 	code := uint32(0)
 	for bits := uint(1); bits <= maxLen; bits++ {
-		code = (code + uint32(blCount[bits-1])) << 1
+		code = (code + uint32(blCount[bits-1])) << 1 //nolint:gosec // blCount values are bounded by alphabet size
 		nextCode[bits] = code
 	}
 
@@ -356,7 +356,7 @@ func canonicalCodes(lengths []uint) []huffCode {
 
 func reverseBits(v uint32, n uint) uint32 {
 	var r uint32
-	for i := uint(0); i < n; i++ {
+	for range n {
 		r = (r << 1) | (v & 1)
 		v >>= 1
 	}
@@ -401,7 +401,7 @@ func writeNormalCode(bw *bitWriter, lengths []uint, alphaSize int) {
 	for i, sym := range rlSym {
 		emit(bw, clCodes[sym])
 		if rlExBits[i] > 0 {
-			bw.writeBits(uint32(rlExtra[i]), rlExBits[i])
+			bw.writeBits(uint32(rlExtra[i]), rlExBits[i]) //nolint:gosec // extras are small RLE values (0..127)
 		}
 	}
 }

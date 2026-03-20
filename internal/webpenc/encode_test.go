@@ -10,8 +10,8 @@ import (
 
 func TestEncodeRIFFStructure(t *testing.T) {
 	img := image.NewNRGBA(image.Rect(0, 0, 4, 4))
-	for y := 0; y < 4; y++ {
-		for x := 0; x < 4; x++ {
+	for y := range 4 {
+		for x := range 4 {
 			img.SetNRGBA(x, y, color.NRGBA{R: 255, G: 0, B: 128, A: 255})
 		}
 	}
