@@ -9,7 +9,7 @@ import (
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
-	"image/png"
+	_ "image/png"
 	"net/url"
 	"os"
 	"os/exec"
@@ -17,6 +17,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/daaa1k/mdp/internal/webpenc"
 	_ "golang.org/x/image/webp"
 )
 
@@ -349,7 +350,7 @@ func getWindowsImages(powerShellPath string) ([]Image, error) {
 	return getPowerShellClipboardImage(ps, "Windows")
 }
 
-// getPowerShellClipboardImage reads the clipboard image via PowerShell and re-encodes it as PNG.
+// getPowerShellClipboardImage reads the clipboard image via PowerShell and re-encodes it as WebP.
 // platform is used only in the error message.
 func getPowerShellClipboardImage(ps, platform string) ([]Image, error) {
 	imgScript := `Add-Type -AssemblyName System.Windows.Forms
@@ -419,7 +420,7 @@ func wslPath(winPath string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// rawToImage converts raw image bytes to a clipboard Image, encoding as PNG (lossless).
+// rawToImage converts raw image bytes to a clipboard Image, encoding as WebP (lossless).
 func rawToImage(data []byte) (Image, error) {
 	webpData, err := toWebP(data)
 	if err != nil {
@@ -428,18 +429,15 @@ func rawToImage(data []byte) (Image, error) {
 	return Image{Data: webpData, Ext: "webp"}, nil
 }
 
-// toWebP decodes any supported image and re-encodes as PNG (lossless).
-// NOTE: golang.org/x/image/webp is a decoder only; we use PNG as the lossless
-// output format. To get actual WebP output, link a CGO encoder such as
-// github.com/chai2010/webp.
+// toWebP decodes any supported image and re-encodes as WebP (VP8L lossless).
 func toWebP(data []byte) ([]byte, error) {
 	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("decode image: %w", err)
 	}
 	var buf bytes.Buffer
-	if err := png.Encode(&buf, img); err != nil {
-		return nil, fmt.Errorf("encode png: %w", err)
+	if err := webpenc.Encode(&buf, img); err != nil {
+		return nil, fmt.Errorf("encode webp: %w", err)
 	}
 	return buf.Bytes(), nil
 }
