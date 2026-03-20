@@ -99,13 +99,12 @@ func TestToWebP_ReencodesPNG(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Output should be a valid PNG (the function re-encodes as PNG despite the name).
-	_, format, err := image.DecodeConfig(bytes.NewReader(out))
-	if err != nil {
-		t.Fatalf("output is not a valid image: %v", err)
+	// Output should be a valid WebP image.
+	if len(out) < 4 || string(out[:4]) != "RIFF" {
+		t.Fatal("expected RIFF header in WebP output")
 	}
-	if format != "png" {
-		t.Errorf("expected png output, got %s", format)
+	if len(out) < 16 || string(out[8:12]) != "WEBP" || string(out[12:16]) != "VP8L" {
+		t.Fatal("expected WEBP/VP8L tags in output")
 	}
 }
 
@@ -136,13 +135,9 @@ func TestRawToImage_PNG(t *testing.T) {
 	if len(img.Data) == 0 {
 		t.Error("expected non-empty image data")
 	}
-	// Output must decode as PNG.
-	_, format, err := image.DecodeConfig(bytes.NewReader(img.Data))
-	if err != nil {
-		t.Fatalf("output is not a valid image: %v", err)
-	}
-	if format != "png" {
-		t.Errorf("expected png-encoded output, got %s", format)
+	// Output must be valid WebP.
+	if len(img.Data) < 16 || string(img.Data[:4]) != "RIFF" || string(img.Data[8:12]) != "WEBP" {
+		t.Error("expected WebP-encoded output")
 	}
 }
 

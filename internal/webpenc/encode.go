@@ -82,7 +82,7 @@ func Encode(w io.Writer, img image.Image) error {
 	bw.writeBits(0, 1) // is_first=false → 1-bit symbol value 0
 
 	// Encode pixels.
-	for i := 0; i < npix; i++ {
+	for i := range npix {
 		emit(bw, gCodes[gPix[i]])
 		emit(bw, rCodes[rPix[i]])
 		emit(bw, bCodes[bPix[i]])
@@ -109,15 +109,16 @@ func emit(bw *bitWriter, c huffCode) {
 
 func writeRIFF(w io.Writer, vp8l []byte) error {
 	pad := len(vp8l) & 1
-	fileSize := uint32(4 + 8 + len(vp8l) + pad) // "WEBP" + VP8L chunk header + data + pad
+	fileSize := uint32(4 + 8 + len(vp8l) + pad) //nolint:gosec // bounded by 16384*16384*4+overhead, fits uint32
+	chunkSize := uint32(len(vp8l))               //nolint:gosec // same bound
 
 	var buf bytes.Buffer
 	buf.Grow(8 + int(fileSize))
 	buf.WriteString("RIFF")
-	binary.Write(&buf, binary.LittleEndian, fileSize)
+	_ = binary.Write(&buf, binary.LittleEndian, fileSize)
 	buf.WriteString("WEBP")
 	buf.WriteString("VP8L")
-	binary.Write(&buf, binary.LittleEndian, uint32(len(vp8l)))
+	_ = binary.Write(&buf, binary.LittleEndian, chunkSize)
 	buf.Write(vp8l)
 	if pad != 0 {
 		buf.WriteByte(0)
@@ -139,7 +140,7 @@ func (w *bitWriter) writeBits(val uint32, nbits uint) {
 	w.acc |= uint64(val) << w.nbits
 	w.nbits += nbits
 	for w.nbits >= 8 {
-		w.buf.WriteByte(byte(w.acc))
+		w.buf.WriteByte(byte(w.acc & 0xFF)) //nolint:gosec // intentional truncation to lowest byte
 		w.acc >>= 8
 		w.nbits -= 8
 	}
@@ -147,7 +148,7 @@ func (w *bitWriter) writeBits(val uint32, nbits uint) {
 
 func (w *bitWriter) flush() {
 	if w.nbits > 0 {
-		w.buf.WriteByte(byte(w.acc))
+		w.buf.WriteByte(byte(w.acc & 0xFF)) //nolint:gosec // intentional truncation to lowest byte
 		w.acc = 0
 		w.nbits = 0
 	}
@@ -218,26 +219,28 @@ func buildAndWriteHuffman(bw *bitWriter, freq []int, alphaSize int) []huffCode {
 // writeSimpleCode writes a VP8L simple Huffman code for 1 or 2 symbols.
 // Pass sym1 < 0 for a single-symbol code.
 func writeSimpleCode(bw *bitWriter, sym0, sym1 int) {
+	s0 := uint32(sym0) //nolint:gosec // sym0 is always 0..255
 	bw.writeBits(1, 1) // simple_code = true
 	if sym1 < 0 {
 		bw.writeBits(0, 1) // num_symbols-1 = 0
 		if sym0 < 2 {
 			bw.writeBits(0, 1)
-			bw.writeBits(uint32(sym0), 1)
+			bw.writeBits(s0, 1)
 		} else {
 			bw.writeBits(1, 1)
-			bw.writeBits(uint32(sym0), 8)
+			bw.writeBits(s0, 8)
 		}
 	} else {
+		s1 := uint32(sym1) //nolint:gosec // sym1 is always 0..255
 		bw.writeBits(1, 1) // num_symbols-1 = 1
 		if sym0 < 2 {
 			bw.writeBits(0, 1)
-			bw.writeBits(uint32(sym0), 1)
+			bw.writeBits(s0, 1)
 		} else {
 			bw.writeBits(1, 1)
-			bw.writeBits(uint32(sym0), 8)
+			bw.writeBits(s0, 8)
 		}
-		bw.writeBits(uint32(sym1), 8)
+		bw.writeBits(s1, 8)
 	}
 }
 
@@ -259,8 +262,8 @@ func (h hheap) Less(i, j int) bool {
 	return h[i].sym < h[j].sym
 }
 func (h hheap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *hheap) Push(x interface{}) { *h = append(*h, x.(*hnode)) }
-func (h *hheap) Pop() interface{} {
+func (h *hheap) Push(x any) { *h = append(*h, x.(*hnode)) }
+func (h *hheap) Pop() any {
 	old := *h
 	n := len(old)
 	x := old[n-1]
@@ -272,7 +275,7 @@ func huffmanLengths(freq []int, size int) []uint {
 	lengths := make([]uint, size)
 
 	var nodes hheap
-	for i := 0; i < size; i++ {
+	for i := range size {
 		if freq[i] > 0 {
 			nodes = append(nodes, &hnode{freq: freq[i], sym: i})
 		}
@@ -338,7 +341,7 @@ func canonicalCodes(lengths []uint) []huffCode {
 		nextCode[bits] = code
 	}
 
-	for sym := 0; sym < n; sym++ {
+	for sym := range n {
 		l := lengths[sym]
 		if l > 0 {
 			codes[sym] = huffCode{
@@ -386,9 +389,9 @@ func writeNormalCode(bw *bitWriter, lengths []uint, alphaSize int) {
 			break
 		}
 	}
-	bw.writeBits(uint32(numCL-4), 4)
-	for i := 0; i < numCL; i++ {
-		bw.writeBits(uint32(clLen[clOrder[i]]), 3)
+	bw.writeBits(uint32(numCL-4), 4) //nolint:gosec // numCL is 4..19
+	for i := range numCL {
+		bw.writeBits(uint32(clLen[clOrder[i]]), 3) //nolint:gosec // code lengths are 0..7
 	}
 
 	// max_symbol = alphabet_size (default).
@@ -484,7 +487,8 @@ func rleEncode(lengths []uint, size int) (syms []int, extras []int, exBits []uin
 			}
 		} else {
 			// Emit one literal code length.
-			syms = append(syms, int(l))
+			li := int(l) //nolint:gosec // code lengths are 0..15
+			syms = append(syms, li)
 			extras = append(extras, 0)
 			exBits = append(exBits, 0)
 			i++
@@ -508,7 +512,7 @@ func rleEncode(lengths []uint, size int) (syms []int, extras []int, exBits []uin
 				run -= n
 			}
 			for run > 0 {
-				syms = append(syms, int(l))
+				syms = append(syms, li)
 				extras = append(extras, 0)
 				exBits = append(exBits, 0)
 				run--
