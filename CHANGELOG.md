@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.2.9](https://github.com/daaa1k/mdp/compare/v0.2.8...v0.2.9) - 2026-03-20
+- Update macOS clipboard method documentation by @daaa1k in https://github.com/daaa1k/mdp/pull/31
+- fix: fix Trivy license scan not working by @daaa1k in https://github.com/daaa1k/mdp/pull/33
+- chore: add skip-missing flag by @daaa1k in https://github.com/daaa1k/mdp/pull/34
+- ci: remove redundant steps by @daaa1k in https://github.com/daaa1k/mdp/pull/35
+- ci: add ci configs by @daaa1k in https://github.com/daaa1k/mdp/pull/36
+- chore: fix ci by @daaa1k in https://github.com/daaa1k/mdp/pull/37
+
 ## [v0.2.8](https://github.com/daaa1k/mdp/compare/v0.2.7...v0.2.8) - 2026-03-18
 - Add YAML configuration file support for mdp by @daaa1k in https://github.com/daaa1k/mdp/pull/29
 
