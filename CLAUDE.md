@@ -68,6 +68,7 @@ internal/
   naming/     naming.go      Timestamp-based filename generation
   config/     config.go      YAML config loading (project + global)
   clipboard/  clipboard.go   Cross-platform clipboard image reading
+  webpenc/    encode.go      Pure-Go VP8L (WebP lossless) encoder
   backend/
     backend.go               Backend interface
     local.go                 Local filesystem backend
@@ -92,4 +93,6 @@ CLI flag --backend > .mdp.yaml (walks up from CWD) > config.yaml in OS config di
 
 ## Notes on WebP output
 
-`golang.org/x/image/webp` is a decoder only. The current implementation re-encodes images as PNG (lossless). For true WebP output, link `github.com/chai2010/webp` (requires CGO).
+Clipboard-pasted images are encoded as true WebP (VP8L lossless) using a
+built-in pure-Go encoder (`internal/webpenc`). No CGO or external libraries
+are required. File-drop images retain their original format as-is.
