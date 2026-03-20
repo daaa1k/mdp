@@ -64,8 +64,8 @@ func TestEncodeRIFFStructure(t *testing.T) {
 func TestEncodeGradient(t *testing.T) {
 	w, h := 16, 16
 	img := image.NewNRGBA(image.Rect(0, 0, w, h))
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
+	for y := range h {
+		for x := range w {
 			img.SetNRGBA(x, y, color.NRGBA{
 				R: uint8(x * 16),
 				G: uint8(y * 16),
