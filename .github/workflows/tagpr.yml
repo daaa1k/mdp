@@ -99,3 +99,17 @@ jobs:
           git add flake.nix
           git diff --staged --quiet || git commit -m "chore(nix): update binary hashes for ${{ needs.tagpr.outputs.tagpr-tag }} [skip ci]"
           git push origin main
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [tagpr, update-nix-hashes]
+    if: needs.tagpr.outputs.tagpr-tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish release (exit draft)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
+        run: gh release edit "$TAG" --draft=false
