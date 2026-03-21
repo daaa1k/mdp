@@ -32,6 +32,10 @@ description = "Run formatting check"
 run = "go build -o mdp ."
 description = "Build binary"
 
+[tasks.e2e-macos-clipboard-webp]
+run = "bash scripts/e2e-macos-clipboard-webp.sh"
+description = "E2E: clipboard snapshot restore → mdp local → WebP (macOS only; skips elsewhere)"
+
 [tasks.ci]
 depends = ["fmt-check", "lint", "test"]
 description = "Run all CI checks"

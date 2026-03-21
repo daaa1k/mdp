@@ -81,16 +81,61 @@ func isWebP(data []byte) bool {
 // ─── macOS ───────────────────────────────────────────────────────────────────
 
 func getMacOSImages() ([]Image, error) {
-	// 1. Try AppleScript FileDrop (files copied from Finder).
-	if imgs, err := getMacOSFileDropImages(); err == nil && len(imgs) > 0 {
-		return imgs, nil
+	// When the pasteboard has public.file-url (Finder file copy), prefer reading those
+	// files so format is preserved. Otherwise treat the clipboard as a pasted image and
+	// normalize to WebP (pngpaste / AppleScript) — otherwise file URLs can win over a
+	// plain PNG/TIFF and we'd save PNG bytes from disk while the user expects WebP.
+	hasFileURLs, err := getMacOSPasteboardHasFileURLs()
+	if err != nil {
+		// If we cannot inspect the pasteboard, keep the historical behavior (file drop first).
+		hasFileURLs = true
 	}
-	// 2. Try pngpaste.
+	if hasFileURLs {
+		if imgs, err := getMacOSFileDropImages(); err == nil && len(imgs) > 0 {
+			return imgs, nil
+		}
+	}
 	if imgs, err := getMacOSPngpaste(); err == nil && len(imgs) > 0 {
 		return imgs, nil
 	}
-	// 3. AppleScript fallback (PNG from screen capture).
-	return getMacOSAppleScript()
+	imgs, err := getMacOSAppleScript()
+	if err == nil {
+		return imgs, nil
+	}
+	if !hasFileURLs {
+		if imgs2, err2 := getMacOSFileDropImages(); err2 == nil && len(imgs2) > 0 {
+			return imgs2, nil
+		}
+	}
+	return nil, err
+}
+
+// getMacOSPasteboardHasFileURLs reports whether any pasteboard item exposes public.file-url
+// (typical for files copied in Finder).
+func getMacOSPasteboardHasFileURLs() (bool, error) {
+	script := `
+ObjC.import("AppKit");
+var pb = $.NSPasteboard.generalPasteboard;
+var items = pb.pasteboardItems;
+var has = false;
+if (items) {
+	var count = items.count;
+	for (var i = 0; i < count; i++) {
+		var item = items.objectAtIndex(i);
+		if (item.stringForType("public.file-url")) {
+			has = true;
+			break;
+		}
+	}
+}
+has ? "1" : "0";
+`
+	cmd := exec.Command("osascript", "-l", "JavaScript", "-e", script)
+	out, err := cmd.Output()
+	if err != nil {
+		return false, err
+	}
+	return strings.TrimSpace(string(out)) == "1", nil
 }
 
 func getMacOSFileDropImages() ([]Image, error) {
