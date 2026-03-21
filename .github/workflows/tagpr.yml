@@ -72,12 +72,15 @@ jobs:
 
       - name: Fetch binary hashes and update flake.nix
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.tagpr.outputs.tagpr-tag }}
         run: |
-          BASE="https://github.com/daaa1k/mdp/releases/download/${VERSION}"
+          # Draft releases do not serve assets at the public releases/download URL; use the API via gh.
+          gh release download "$VERSION" --repo "${{ github.repository }}" \
+            --pattern checksums.txt --output checksums.txt
           # Use checksums.txt (already computed by goreleaser) instead of re-downloading binaries.
           # Convert hex SHA256 → SRI format (sha256-<base64>) required by Nix fetchurl's `hash` attribute.
-          CHECKSUMS=$(curl -fsSL "${BASE}/checksums.txt")
+          CHECKSUMS=$(cat checksums.txt)
           LINUX_HASH=$(echo "$CHECKSUMS" | awk '/mdp-linux-amd64$/{print $1}' | xxd -r -p | base64 -w0 | sed 's/^/sha256-/')
           MACOS_HASH=$(echo "$CHECKSUMS"  | awk '/mdp-darwin-arm64$/{print $1}' | xxd -r -p | base64 -w0 | sed 's/^/sha256-/')
           echo "linux amd64: $LINUX_HASH"
