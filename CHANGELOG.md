@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.2](https://github.com/daaa1k/mdp/compare/v0.3.1...v0.3.2) - 2026-03-21
+- ci(tagpr): pass checksums.txt to Nix job via workflow artifact by @daaa1k in https://github.com/daaa1k/mdp/pull/44
+
 ## [v0.3.1](https://github.com/daaa1k/mdp/compare/v0.3.0...v0.3.1) - 2026-03-21
 - Add Cursor Cloud development environment setup by @daaa1k in https://github.com/daaa1k/mdp/pull/41
 - fix(ci): GoReleaser owns GitHub Releases (fix tagpr draft + assets) by @daaa1k in https://github.com/daaa1k/mdp/pull/43
