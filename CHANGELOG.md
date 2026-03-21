@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.3](https://github.com/daaa1k/mdp/compare/v0.3.2...v0.3.3) - 2026-03-21
+- fix(ci): set GH_REPO for publish-release job by @daaa1k in https://github.com/daaa1k/mdp/pull/46
+
 ## [v0.3.2](https://github.com/daaa1k/mdp/compare/v0.3.1...v0.3.2) - 2026-03-21
 - ci(tagpr): pass checksums.txt to Nix job via workflow artifact by @daaa1k in https://github.com/daaa1k/mdp/pull/44
 
