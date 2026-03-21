@@ -123,5 +123,7 @@ jobs:
       - name: Publish release (exit draft)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This job has no checkout; gh otherwise resolves the repo via git and fails.
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
         run: gh release edit "$TAG" --draft=false
