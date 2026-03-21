@@ -112,9 +112,11 @@ jobs:
           git diff --staged --quiet || git commit -m "chore(nix): update binary hashes for ${{ needs.tagpr.outputs.tagpr-tag }} [skip ci]"
           git push origin main
 
+  # Publish as soon as binaries exist. Do not wait for update-nix-hashes: if that job fails
+  # (deploy key, awk, push), the release would otherwise stay draft forever.
   publish-release:
     name: Publish GitHub Release
-    needs: [tagpr, update-nix-hashes]
+    needs: [tagpr, assets]
     if: needs.tagpr.outputs.tagpr-tag != ''
     runs-on: ubuntu-latest
     permissions:
