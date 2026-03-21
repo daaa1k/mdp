@@ -30,19 +30,52 @@ type Image struct {
 // GetImages returns all images currently on the clipboard.
 // powerShellPath is used on WSL2/Windows to locate powershell.exe; leave empty for auto-detection.
 func GetImages(powerShellPath string) ([]Image, error) {
+	var imgs []Image
+	var err error
 	switch runtime.GOOS {
 	case "darwin":
-		return getMacOSImages()
+		imgs, err = getMacOSImages()
 	case "linux":
 		if isWSL() {
-			return getWSL2Images(powerShellPath)
+			imgs, err = getWSL2Images(powerShellPath)
+		} else {
+			imgs, err = getLinuxImages()
 		}
-		return getLinuxImages()
 	case "windows":
-		return getWindowsImages(powerShellPath)
+		imgs, err = getWindowsImages(powerShellPath)
 	default:
 		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
+	if err != nil {
+		return nil, err
+	}
+	return normalizeWebPImages(imgs)
+}
+
+// normalizeWebPImages ensures bytes match a .webp extension: if Ext is "webp" but the payload
+// is not a WebP file (e.g. PNG bytes under a misnamed path, or file-URL taking precedence over
+// a real clipboard image on macOS), re-encode via toWebP.
+func normalizeWebPImages(imgs []Image) ([]Image, error) {
+	for i := range imgs {
+		if strings.ToLower(imgs[i].Ext) != "webp" {
+			continue
+		}
+		if isWebP(imgs[i].Data) {
+			continue
+		}
+		out, err := toWebP(imgs[i].Data)
+		if err != nil {
+			return nil, fmt.Errorf("clipboard: expected webp bytes: %w", err)
+		}
+		imgs[i].Data = out
+	}
+	return imgs, nil
+}
+
+func isWebP(data []byte) bool {
+	return len(data) >= 12 &&
+		bytes.Equal(data[:4], []byte("RIFF")) &&
+		bytes.Equal(data[8:12], []byte("WEBP"))
 }
 
 // ─── macOS ───────────────────────────────────────────────────────────────────
