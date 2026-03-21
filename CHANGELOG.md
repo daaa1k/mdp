@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.2.10](https://github.com/daaa1k/mdp/compare/v0.2.9...v0.2.10) - 2026-03-21
+## [v0.3.0](https://github.com/daaa1k/mdp/compare/v0.2.9...v0.3.0) - 2026-03-21
 - fix: encode clipboard images as real WebP instead of PNG with .webp extension by @daaa1k in https://github.com/daaa1k/mdp/pull/39
 
 ## [v0.2.9](https://github.com/daaa1k/mdp/compare/v0.2.8...v0.2.9) - 2026-03-20
