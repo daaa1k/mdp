@@ -1,5 +1,8 @@
 version: 2
 
+release:
+  draft: false
+
 builds:
   - env:
       - CGO_ENABLED=0
