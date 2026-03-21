@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.3.1](https://github.com/daaa1k/mdp/compare/v0.3.0...v0.3.1) - 2026-03-21
+- Add Cursor Cloud development environment setup by @daaa1k in https://github.com/daaa1k/mdp/pull/41
+- fix(ci): GoReleaser owns GitHub Releases (fix tagpr draft + assets) by @daaa1k in https://github.com/daaa1k/mdp/pull/43
+
 ## [v0.3.0](https://github.com/daaa1k/mdp/compare/v0.2.9...v0.3.0) - 2026-03-21
 - fix: encode clipboard images as real WebP instead of PNG with .webp extension by @daaa1k in https://github.com/daaa1k/mdp/pull/39
 
