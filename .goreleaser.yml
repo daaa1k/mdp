@@ -1,7 +1,8 @@
 version: 2
 
 release:
-  draft: false
+  # Stay draft until tagpr workflow runs gh release edit after update-nix-hashes.
+  draft: true
 
 builds:
   - env:
