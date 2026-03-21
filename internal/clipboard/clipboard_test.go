@@ -147,3 +147,44 @@ func TestRawToImage_InvalidData(t *testing.T) {
 		t.Error("expected error for invalid data")
 	}
 }
+
+// ─── normalizeWebPImages ─────────────────────────────────────────────────────
+
+func TestNormalizeWebPImages_MislabeledPNG(t *testing.T) {
+	pngBytes := makeTestPNG(t)
+	imgs, err := normalizeWebPImages([]Image{{Data: pngBytes, Ext: "webp"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(imgs) != 1 {
+		t.Fatalf("got %d images, want 1", len(imgs))
+	}
+	if !isWebP(imgs[0].Data) {
+		t.Fatal("expected output to be valid WebP after normalization")
+	}
+}
+
+func TestNormalizeWebPImages_PassthroughRealWebP(t *testing.T) {
+	webpBytes, err := toWebP(makeTestPNG(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	imgs, err := normalizeWebPImages([]Image{{Data: webpBytes, Ext: "webp"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(imgs[0].Data, webpBytes) {
+		t.Fatal("expected real WebP payload to be unchanged")
+	}
+}
+
+func TestNormalizeWebPImages_NonWebPExtUnchanged(t *testing.T) {
+	pngBytes := makeTestPNG(t)
+	imgs, err := normalizeWebPImages([]Image{{Data: pngBytes, Ext: "png"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(imgs[0].Data, pngBytes) {
+		t.Fatal("expected non-webp extension to leave bytes unchanged")
+	}
+}
