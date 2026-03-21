@@ -1,7 +1,7 @@
 version: 2
 
 release:
-  # Stay draft until tagpr workflow publish-release job runs gh release edit (after GoReleaser).
+  # Stay draft until tagpr workflow assets job PATCHes the release after GoReleaser.
   draft: true
 
 builds:

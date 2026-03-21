@@ -1,8 +1,9 @@
 [tagpr]
 vPrefix = true
 releaseBranch = main
-# Draft until CI publishes after GoReleaser assets and Nix flake hash update (see tagpr.yml).
-release = draft
+# Let GoReleaser create the GitHub Release (draft: true in .goreleaser.yml); tagpr must not
+# also create a release or CI can target the wrong release / leave a duplicate draft.
+release = false
 versionFile = VERSION
 command = "mise run prerelease-for-tagpr"
 majorLabels = "tagpr:major"

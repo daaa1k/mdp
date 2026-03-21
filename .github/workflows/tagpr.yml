@@ -58,6 +58,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
+      # Run immediately after GoReleaser (same job). tagpr.release=false so only this release exists.
+      # REST PATCH + verify; avoids duplicate tagpr draft releases and cross-job timing issues.
+      - name: Publish GitHub Release (exit draft)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
+        run: |
+          set -euo pipefail
+          TAG="${TAG#refs/tags/}"
+          TAG="${TAG//$'\n'/}"
+          REL_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .id)
+          gh api "repos/${GITHUB_REPOSITORY}/releases/${REL_ID}" -X PATCH -f draft=false
+          if [ "$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .draft)" = "true" ]; then
+            echo "::error::Release ${TAG} is still draft after publish step"
+            exit 1
+          fi
+
       - name: Upload checksums for Nix flake update
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -111,21 +128,3 @@ jobs:
           git add flake.nix
           git diff --staged --quiet || git commit -m "chore(nix): update binary hashes for ${{ needs.tagpr.outputs.tagpr-tag }} [skip ci]"
           git push origin main
-
-  # Publish as soon as binaries exist. Do not wait for update-nix-hashes: if that job fails
-  # (deploy key, awk, push), the release would otherwise stay draft forever.
-  publish-release:
-    name: Publish GitHub Release
-    needs: [tagpr, assets]
-    if: needs.tagpr.outputs.tagpr-tag != ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Publish release (exit draft)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # This job has no checkout; gh otherwise resolves the repo via git and fails.
-          GH_REPO: ${{ github.repository }}
-          TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
-        run: gh release edit "$TAG" --draft=false
