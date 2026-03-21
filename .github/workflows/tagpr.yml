@@ -33,6 +33,7 @@ jobs:
     if: needs.tagpr.outputs.tagpr-tag != ''
     runs-on: ubuntu-latest
     permissions:
+      actions: write
       contents: write
       packages: write
     env:
@@ -57,11 +58,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
+      - name: Upload checksums for Nix flake update
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: goreleaser-checksums
+          path: dist/checksums.txt
+          if-no-files-found: error
+
   update-nix-hashes:
     name: Update Nix binary hashes
     needs: [tagpr, assets]
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: write
     steps:
       - name: Check out source code
@@ -70,15 +79,15 @@ jobs:
           fetch-depth: 0
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
+      - name: Download checksums from GoReleaser job
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: goreleaser-checksums
+
       - name: Fetch binary hashes and update flake.nix
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.tagpr.outputs.tagpr-tag }}
         run: |
-          # Draft releases do not serve assets at the public releases/download URL; use the API via gh.
-          gh release download "$VERSION" --repo "${{ github.repository }}" \
-            --pattern checksums.txt --output checksums.txt
-          # Use checksums.txt (already computed by goreleaser) instead of re-downloading binaries.
+          # Use checksums.txt from the assets job (same run as GoReleaser), not the GitHub Release API.
+          # Draft releases are unreliable for gh/curl downloads before publish.
           # Convert hex SHA256 → SRI format (sha256-<base64>) required by Nix fetchurl's `hash` attribute.
           CHECKSUMS=$(cat checksums.txt)
           LINUX_HASH=$(echo "$CHECKSUMS" | awk '/mdp-linux-amd64$/{print $1}' | xxd -r -p | base64 -w0 | sed 's/^/sha256-/')
