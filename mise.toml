@@ -36,6 +36,10 @@ description = "Build binary"
 run = "bash scripts/e2e-macos-clipboard-webp.sh"
 description = "E2E: clipboard snapshot restore → mdp local → WebP (macOS only; skips elsewhere)"
 
+[tasks.e2e-macos-file-drop]
+run = "bash scripts/e2e-macos-file-drop.sh"
+description = "E2E: file-drop → mdp local → PNG/JPEG/WebP bytes (macOS only; skips elsewhere)"
+
 [tasks.ci]
 depends = ["fmt-check", "lint", "test"]
 description = "Run all CI checks"

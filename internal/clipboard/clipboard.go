@@ -81,61 +81,83 @@ func isWebP(data []byte) bool {
 // ─── macOS ───────────────────────────────────────────────────────────────────
 
 func getMacOSImages() ([]Image, error) {
-	// When the pasteboard has public.file-url (Finder file copy), prefer reading those
-	// files so format is preserved. Otherwise treat the clipboard as a pasted image and
-	// normalize to WebP (pngpaste / AppleScript) — otherwise file URLs can win over a
-	// plain PNG/TIFF and we'd save PNG bytes from disk while the user expects WebP.
-	hasFileURLs, err := getMacOSPasteboardHasFileURLs()
-	if err != nil {
-		// If we cannot inspect the pasteboard, keep the historical behavior (file drop first).
-		hasFileURLs = true
-	}
-	if hasFileURLs {
-		if imgs, err := getMacOSFileDropImages(); err == nil && len(imgs) > 0 {
-			return imgs, nil
-		}
+	// Prefer file paths when the pasteboard holds a file drop (Finder copy, etc.) so
+	// format is preserved. Run file drop before pngpaste/AppleScript: some pasteboards
+	// only expose paths inside getMacOSFileDropImages (JXA + AppleScript fallback).
+	if imgs, err := getMacOSFileDropImages(); err == nil && len(imgs) > 0 {
+		return imgs, nil
 	}
 	if imgs, err := getMacOSPngpaste(); err == nil && len(imgs) > 0 {
+		return imgs, nil
+	}
+	// Retry file drop after pngpaste; pngpaste can mutate pasteboard state on edge builds.
+	if imgs, err := getMacOSFileDropImages(); err == nil && len(imgs) > 0 {
 		return imgs, nil
 	}
 	imgs, err := getMacOSAppleScript()
 	if err == nil {
 		return imgs, nil
 	}
-	if !hasFileURLs {
-		if imgs2, err2 := getMacOSFileDropImages(); err2 == nil && len(imgs2) > 0 {
-			return imgs2, nil
-		}
-	}
 	return nil, err
 }
 
-// getMacOSPasteboardHasFileURLs reports whether any pasteboard item exposes public.file-url
-// (typical for files copied in Finder).
-func getMacOSPasteboardHasFileURLs() (bool, error) {
+// macosClipboardPOSIXPathsAppleScript returns newline-separated POSIX paths for a
+// clipboard that holds file reference(s). Covers AppleScript "set the clipboard
+// to POSIX file …" which does not always expose public.file-url to JXA.
+func macosClipboardPOSIXPathsAppleScript() (string, error) {
 	script := `
-ObjC.import("AppKit");
-var pb = $.NSPasteboard.generalPasteboard;
-var items = pb.pasteboardItems;
-var has = false;
-if (items) {
-	var count = items.count;
-	for (var i = 0; i < count; i++) {
-		var item = items.objectAtIndex(i);
-		if (item.stringForType("public.file-url")) {
-			has = true;
-			break;
+try
+	set c to the clipboard as list of alias
+on error
+	try
+		set c to {the clipboard as alias}
+	on error
+		set c to the clipboard
+		if (class of c) is not list then
+			set c to {c}
+		end if
+	end try
+end try
+set delim to ASCII character 10
+set out to ""
+repeat with f in c
+	set fp to ""
+	try
+		set fp to POSIX path of f
+	on error
+		try
+			set fp to POSIX path of (f as alias)
+		on error
+			try
+				set fp to POSIX path of (f as file)
+			on error
+				try
+					set fp to POSIX path of (f as file specification)
+				end try
+			end try
+		end try
+	end try
+	if fp is not "" then
+		if length of out > 0 then set out to out & delim
+		set out to out & fp
+	end if
+end repeat
+return out
+`
+	cmd := exec.Command("osascript", "-e", script)
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+func splitMacOSFileDropPaths(s string) []string {
+	var out []string
+	for _, line := range strings.Split(strings.TrimSpace(s), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			out = append(out, line)
 		}
 	}
-}
-has ? "1" : "0";
-`
-	cmd := exec.Command("osascript", "-l", "JavaScript", "-e", script)
-	out, err := cmd.Output()
-	if err != nil {
-		return false, err
-	}
-	return strings.TrimSpace(string(out)) == "1", nil
+	return out
 }
 
 func getMacOSFileDropImages() ([]Image, error) {
@@ -143,38 +165,59 @@ func getMacOSFileDropImages() ([]Image, error) {
 	// AppleScript «class furl» only returns the first file; pasteboardItems handles N files.
 	// Finder copies files as persistent file-reference URLs (file:///.file/id=...).
 	// url.filePathURL resolves these to regular file-path URLs before extracting the path.
+	// AppleScript "set the clipboard to POSIX file …" may only set NSFilenamesPboardType,
+	// so we fall back to that property list when public.file-url yields no paths.
 	script := `
 ObjC.import("AppKit");
 var pb = $.NSPasteboard.generalPasteboard;
 var items = pb.pasteboardItems;
 var result = [];
+function pushPathFromFileURLString(urlStr) {
+	if (!urlStr) {
+		return;
+	}
+	var url = $.NSURL.URLWithString($(ObjC.unwrap(urlStr)));
+	var pathURL = url ? url.filePathURL : null;
+	if (pathURL) {
+		result.push(ObjC.unwrap(pathURL.path));
+	}
+}
 if (items) {
 	var count = items.count;
 	for (var i = 0; i < count; i++) {
 		var item = items.objectAtIndex(i);
-		var urlStr = item.stringForType("public.file-url");
-		if (urlStr) {
-			var url = $.NSURL.URLWithString($(ObjC.unwrap(urlStr)));
-			var pathURL = url.filePathURL;
-			if (pathURL) {
-				result.push(ObjC.unwrap(pathURL.path));
-			}
+		pushPathFromFileURLString(item.stringForType("public.file-url"));
+	}
+}
+if (result.length === 0) {
+	var topUrl = pb.stringForType("public.file-url");
+	pushPathFromFileURLString(topUrl);
+}
+if (result.length === 0) {
+	var filenames = pb.propertyListForType("NSFilenamesPboardType");
+	if (filenames) {
+		var n = filenames.count;
+		for (var j = 0; j < n; j++) {
+			result.push(ObjC.unwrap(filenames.objectAtIndex(j)));
 		}
 	}
 }
 result.join("\n");
 `
 	cmd := exec.Command("osascript", "-l", "JavaScript", "-e", script)
-	out, err := cmd.Output()
-	if err != nil || strings.TrimSpace(string(out)) == "" {
+	jxaOut, _ := cmd.Output()
+	paths := splitMacOSFileDropPaths(string(jxaOut))
+	if len(paths) == 0 {
+		asOut, asErr := macosClipboardPOSIXPathsAppleScript()
+		if asErr == nil {
+			paths = splitMacOSFileDropPaths(asOut)
+		}
+	}
+	if len(paths) == 0 {
 		return nil, fmt.Errorf("no file drop")
 	}
 	var imgs []Image
-	for _, p := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-		p = strings.TrimSpace(p)
-		if p == "" {
-			continue
-		}
+	for _, p := range paths {
 		data, err := os.ReadFile(p)
 		if err != nil {
 			continue
@@ -184,6 +227,9 @@ result.join("\n");
 			ext = "png"
 		}
 		imgs = append(imgs, Image{Data: data, Ext: strings.ToLower(ext)})
+	}
+	if len(imgs) == 0 {
+		return nil, fmt.Errorf("no file drop")
 	}
 	return imgs, nil
 }

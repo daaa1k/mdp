@@ -40,6 +40,19 @@ jobs:
       - name: Clipboard snapshot → mdp → WebP
         run: mise run e2e-macos-clipboard-webp
 
+  e2e-macos-file-drop:
+    name: E2E FileDrop → local (macOS)
+    runs-on: macos-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup mise
+        uses: jdx/mise-action@c1ecc8f748cd28cdeabf76dab3cccde4ce692fe4 # v4.0.0
+
+      - name: File drop → mdp → preserve format and bytes
+        run: mise run e2e-macos-file-drop
+
   nix:
     name: Nix flake check (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
