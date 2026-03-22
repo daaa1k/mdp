@@ -58,29 +58,30 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
-      # After GoReleaser: tagpr has already created a draft release for this tag; PATCH to publish.
-      # Retry lookup in case the GitHub API is briefly behind GoReleaser/tagpr.
+      # After GoReleaser: tagpr has already created a draft release for this tag; publish it.
+      # Use `gh release edit` (by tag) instead of REST PATCH by numeric id — jq .id on 404 can yield
+      # "null" or other non-numeric values and break PATCH URLs.
       - name: Publish GitHub Release (exit draft)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
         run: |
           set -euo pipefail
           TAG="${TAG#refs/tags/}"
           TAG="${TAG//$'\n'/}"
-          REL_ID=""
           for _ in $(seq 1 30); do
-            if REL_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .id 2>/dev/null) && [ -n "$REL_ID" ]; then
+            if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
               break
             fi
             sleep 2
           done
-          if [ -z "$REL_ID" ]; then
-            echo "::error::No GitHub release for tag ${TAG} (GET .../releases/tags/${TAG} kept returning 404)"
+          if ! gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "::error::No GitHub release for tag ${TAG} after waiting"
             exit 1
           fi
-          gh api "repos/${GITHUB_REPOSITORY}/releases/${REL_ID}" -X PATCH -f draft=false
-          if [ "$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .draft)" = "true" ]; then
+          gh release edit "$TAG" --draft=false --repo "$GH_REPO"
+          if [ "$(gh release view "$TAG" --repo "$GH_REPO" --json isDraft --jq .isDraft)" != "false" ]; then
             echo "::error::Release ${TAG} is still draft after publish step"
             exit 1
           fi
