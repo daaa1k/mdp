@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.7](https://github.com/daaa1k/mdp/compare/v0.3.6...v0.3.7) - 2026-03-22
+- fix(ci): add use_existing_draft to GoReleaser so it finds tagpr draft release by @daaa1k in https://github.com/daaa1k/mdp/pull/54
+
 ## [v0.3.6](https://github.com/daaa1k/mdp/compare/v0.3.5...v0.3.6) - 2026-03-22
 - fix(ci): publish release with gh release edit, avoid broken REST id from jq by @daaa1k in https://github.com/daaa1k/mdp/pull/52
 
