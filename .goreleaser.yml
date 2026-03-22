@@ -1,8 +1,12 @@
 version: 2
 
 release:
-  # Stay draft until tagpr workflow assets job PATCHes the release after GoReleaser.
+  # Stay draft until tagpr workflow assets job publishes the release after GoReleaser.
   draft: true
+  # tagpr creates a draft release before GoReleaser runs (`.tagpr` release = draft).
+  # Without this flag GoReleaser looks up releases via GET /releases/tags/{tag},
+  # which returns 404 for drafts, causing a conflict or failure.
+  use_existing_draft: true
 
 builds:
   - env:
