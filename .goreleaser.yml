@@ -1,7 +1,7 @@
 version: 2
 
 release:
-  # Stay draft until tagpr workflow runs gh release edit after update-nix-hashes.
+  # Stay draft until tagpr workflow assets job PATCHes the release after GoReleaser.
   draft: true
 
 builds:
