@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.6](https://github.com/daaa1k/mdp/compare/v0.3.5...v0.3.6) - 2026-03-22
+- fix(ci): publish release with gh release edit, avoid broken REST id from jq by @daaa1k in https://github.com/daaa1k/mdp/pull/52
+
 ## [v0.3.5](https://github.com/daaa1k/mdp/compare/v0.3.4...v0.3.5) - 2026-03-22
 - fix(ci): restore tagpr draft release + retry before PATCH (fix 404) by @daaa1k in https://github.com/daaa1k/mdp/pull/50
 
