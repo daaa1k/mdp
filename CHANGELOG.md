@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.4](https://github.com/daaa1k/mdp/compare/v0.3.3...v0.3.4) - 2026-03-22
+- fix(ci): single GoReleaser release, REST PATCH to publish, verify draft cleared by @daaa1k in https://github.com/daaa1k/mdp/pull/48
+
 ## [v0.3.3](https://github.com/daaa1k/mdp/compare/v0.3.2...v0.3.3) - 2026-03-21
 - fix(ci): set GH_REPO for publish-release job by @daaa1k in https://github.com/daaa1k/mdp/pull/46
 
