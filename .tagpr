@@ -1,9 +1,10 @@
 [tagpr]
 vPrefix = true
 releaseBranch = main
-# Let GoReleaser create the GitHub Release (draft: true in .goreleaser.yml); tagpr must not
-# also create a release or CI can target the wrong release / leave a duplicate draft.
-release = false
+# Create the GitHub Release as draft when tagging so it always exists before the assets job
+# (avoids GET /releases/tags/{tag} 404 if GoReleaser has not registered the release yet).
+# GoReleaser still uses draft: true and uploads into this release; CI then PATCHes draft=false.
+release = draft
 versionFile = VERSION
 command = "mise run prerelease-for-tagpr"
 majorLabels = "tagpr:major"
