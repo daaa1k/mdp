@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.5](https://github.com/daaa1k/mdp/compare/v0.3.4...v0.3.5) - 2026-03-22
+- fix(ci): restore tagpr draft release + retry before PATCH (fix 404) by @daaa1k in https://github.com/daaa1k/mdp/pull/50
+
 ## [v0.3.4](https://github.com/daaa1k/mdp/compare/v0.3.3...v0.3.4) - 2026-03-22
 - fix(ci): single GoReleaser release, REST PATCH to publish, verify draft cleared by @daaa1k in https://github.com/daaa1k/mdp/pull/48
 
