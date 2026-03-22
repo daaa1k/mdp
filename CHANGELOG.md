@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.8](https://github.com/daaa1k/mdp/compare/v0.3.7...v0.3.8) - 2026-03-22
+- test: add e2e for macOS FileDrop by @daaa1k in https://github.com/daaa1k/mdp/pull/61
+
 ## [v0.3.7](https://github.com/daaa1k/mdp/compare/v0.3.6...v0.3.7) - 2026-03-22
 - fix(ci): add use_existing_draft to GoReleaser so it finds tagpr draft release by @daaa1k in https://github.com/daaa1k/mdp/pull/54
 
