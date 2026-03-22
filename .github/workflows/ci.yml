@@ -40,6 +40,9 @@ jobs:
       - name: Clipboard snapshot → mdp → WebP
         run: mise run e2e-macos-clipboard-webp
 
+      - name: File drop clipboard → mdp → identical files
+        run: mise run e2e-macos-clipboard-filedrop
+
   nix:
     name: Nix flake check (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
