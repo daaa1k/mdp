@@ -58,8 +58,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
-      # Run immediately after GoReleaser (same job). tagpr.release=false so only this release exists.
-      # REST PATCH + verify; avoids duplicate tagpr draft releases and cross-job timing issues.
+      # After GoReleaser: tagpr has already created a draft release for this tag; PATCH to publish.
+      # Retry lookup in case the GitHub API is briefly behind GoReleaser/tagpr.
       - name: Publish GitHub Release (exit draft)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,17 @@ jobs:
           set -euo pipefail
           TAG="${TAG#refs/tags/}"
           TAG="${TAG//$'\n'/}"
-          REL_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .id)
+          REL_ID=""
+          for _ in $(seq 1 30); do
+            if REL_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .id 2>/dev/null) && [ -n "$REL_ID" ]; then
+              break
+            fi
+            sleep 2
+          done
+          if [ -z "$REL_ID" ]; then
+            echo "::error::No GitHub release for tag ${TAG} (GET .../releases/tags/${TAG} kept returning 404)"
+            exit 1
+          fi
           gh api "repos/${GITHUB_REPOSITORY}/releases/${REL_ID}" -X PATCH -f draft=false
           if [ "$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .draft)" = "true" ]; then
             echo "::error::Release ${TAG} is still draft after publish step"
