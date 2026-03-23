@@ -3,6 +3,23 @@
 #Requires -Version 5.1
 $ErrorActionPreference = 'Stop'
 
+# Avoid Get-FileHash: not available in some Windows PowerShell -Sta / CI environments.
+function Get-FileSha256Hex {
+    param([Parameter(Mandatory)][string]$LiteralPath)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $fs = [System.IO.File]::OpenRead($LiteralPath)
+        try {
+            $bytes = $sha.ComputeHash($fs)
+        } finally {
+            $fs.Dispose()
+        }
+    } finally {
+        $sha.Dispose()
+    }
+    return ([System.BitConverter]::ToString($bytes)) -replace '-', ''
+}
+
 function Assert-OutCount {
     param([Parameter(Mandatory)][string]$OutDir, [Parameter(Mandatory)][int]$Want)
     $items = @(Get-ChildItem -LiteralPath $OutDir -File -ErrorAction SilentlyContinue)
@@ -18,10 +35,10 @@ function Assert-OutputsMatchSources {
         Write-Error "output count $($outs.Count) != source count $($Sources.Count)"
     }
     foreach ($src in $Sources) {
-        $hashSrc = (Get-FileHash -Algorithm SHA256 -LiteralPath $src).Hash
+        $hashSrc = Get-FileSha256Hex -LiteralPath $src
         $found = $false
         foreach ($o in $outs) {
-            if ((Get-FileHash -Algorithm SHA256 -LiteralPath $o.FullName).Hash -eq $hashSrc) {
+            if ((Get-FileSha256Hex -LiteralPath $o.FullName) -eq $hashSrc) {
                 $found = $true
                 break
             }
