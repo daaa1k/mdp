@@ -27,6 +27,16 @@ jobs:
       - name: Format Check / Lint / Test
         run: mise run ci
 
+      - name: Install E2E deps (Linux Wayland)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y weston wl-clipboard
+
+      - name: E2E Test (Linux Wayland)
+        if: runner.os == 'Linux'
+        run: mise run e2e-ci-linux-wayland
+
       - name: E2E Test (macOS)
         if: runner.os == 'macOS'
         run: |
