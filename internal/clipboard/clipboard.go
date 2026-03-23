@@ -351,12 +351,24 @@ func parseURIList(raw string) []string {
 // ─── WSL2 ────────────────────────────────────────────────────────────────────
 
 func isWSL() bool {
+	// Do not use "/proc/version" alone: Docker on WSL2 inherits a "microsoft"
+	// kernel string but should use native Linux clipboard (Wayland/X11).
+	if os.Getenv("WSL_INTEROP") != "" {
+		return true
+	}
+	if _, err := os.Stat("/proc/sys/fs/binfmt_misc/WSLInterop"); err == nil {
+		return true
+	}
 	data, err := os.ReadFile("/proc/version")
 	if err != nil {
 		return false
 	}
 	lower := strings.ToLower(string(data))
-	return strings.Contains(lower, "microsoft") || strings.Contains(lower, "wsl")
+	if !strings.Contains(lower, "microsoft") && !strings.Contains(lower, "wsl") {
+		return false
+	}
+	_, err = exec.LookPath("wslpath")
+	return err == nil
 }
 
 func getWSL2Images(powerShellPath string) ([]Image, error) {

@@ -54,7 +54,7 @@ description = "E2E (CI parity): native Windows PowerShell clipboard; same fixtur
 
 [tasks.e2e-ci-linux-wayland]
 run = "bash scripts/ci-e2e-linux-wayland.sh"
-description = "E2E (CI parity): Wayland wl-clipboard (+ headless Weston if no session); same fixtures as macOS/WSL2/Windows"
+description = "E2E (CI parity): Wayland wl-clipboard (+ Xvfb+nested Weston if no session); same fixtures as macOS/WSL2/Windows"
 
 [tasks.ci]
 depends = ["fmt-check", "lint", "test"]

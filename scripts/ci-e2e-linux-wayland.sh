@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # CI / native Linux (Wayland only): same E2E cases as macOS / WSL2 / Windows.
 # Uses wl-copy / wl-paste with an existing session (WAYLAND_DISPLAY) or starts
-# headless Weston when unset (e.g. GitHub Actions ubuntu-latest).
+# Xvfb + Weston (X11 backend) when unset. Headless Weston does not implement
+# wl_seat, which wl-clipboard requires; nested Weston on Xvfb does.
 set -euo pipefail
 
 if [[ "$(uname -s)" != Linux ]]; then
@@ -9,7 +10,9 @@ if [[ "$(uname -s)" != Linux ]]; then
   exit 0
 fi
 
-if [[ -r /proc/version ]] && grep -qiE 'microsoft|wsl' /proc/version; then
+# Do not use /proc/version alone: Docker on WSL2 inherits a "microsoft" kernel string
+# but is still plain Linux for our purposes. Real WSL exposes WSLInterop / WSL_INTEROP.
+if [[ -n "${WSL_INTEROP:-}" ]] || [[ -r /proc/sys/fs/binfmt_misc/WSLInterop ]]; then
   echo "skip: use e2e-wsl-* on WSL2; this task is for native Linux Wayland" >&2
   exit 0
 fi
@@ -23,6 +26,8 @@ done
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP=""
+XVFB_PID=""
+XVFB_STARTED=0
 WESTON_PID=""
 WESTON_STARTED=0
 
@@ -35,24 +40,37 @@ cleanup() {
     kill "$WESTON_PID" 2>/dev/null || true
     wait "$WESTON_PID" 2>/dev/null || true
   fi
+  if [[ "$XVFB_STARTED" -eq 1 && -n "$XVFB_PID" ]]; then
+    kill "$XVFB_PID" 2>/dev/null || true
+    wait "$XVFB_PID" 2>/dev/null || true
+  fi
 }
 trap cleanup EXIT
 
-start_headless_weston_if_needed() {
+start_wayland_compositor_if_needed() {
   if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
     return 0
   fi
-  if ! command -v weston >/dev/null 2>&1; then
-    echo "error: WAYLAND_DISPLAY unset and weston not found (install weston or run inside a Wayland session)" >&2
-    exit 1
-  fi
+  for bin in Xvfb weston; do
+    if ! command -v "$bin" >/dev/null 2>&1; then
+      echo "error: $bin not found (install xvfb and weston, or run inside a Wayland session)" >&2
+      exit 1
+    fi
+  done
   : "${XDG_RUNTIME_DIR:=/tmp/mdp-xdg-runtime-$$}"
   mkdir -p "$XDG_RUNTIME_DIR"
   chmod 700 "$XDG_RUNTIME_DIR"
   export XDG_RUNTIME_DIR
 
+  local dpy_num="${MDP_E2E_XVFB_DISPLAY:-99}"
+  Xvfb ":${dpy_num}" -screen 0 1024x768x24 >/tmp/mdp-xvfb-e2e.log 2>&1 &
+  XVFB_PID=$!
+  XVFB_STARTED=1
+  export DISPLAY=":${dpy_num}"
+  sleep 1
+
   export WAYLAND_DISPLAY=wayland-mdp-e2e
-  weston --no-config --backend=headless --socket="$WAYLAND_DISPLAY" >/tmp/weston-mdp-e2e.log 2>&1 &
+  weston --no-config --backend=x11 --socket="$WAYLAND_DISPLAY" >/tmp/weston-mdp-e2e.log 2>&1 &
   WESTON_PID=$!
   WESTON_STARTED=1
 
@@ -69,7 +87,7 @@ start_headless_weston_if_needed() {
   exit 1
 }
 
-start_headless_weston_if_needed
+start_wayland_compositor_if_needed
 
 # --- clipboard WebP (PNG on clipboard) ---
 FIXTURE_SNAP="$ROOT/e2e/fixtures/clipboard-snapshot"
