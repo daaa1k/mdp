@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.3.9](https://github.com/daaa1k/mdp/compare/v0.3.8...v0.3.9) - 2026-03-23
+- test: add E2E test for windows by @daaa1k in https://github.com/daaa1k/mdp/pull/62
+- test: add E2E test for linux (wayland) by @daaa1k in https://github.com/daaa1k/mdp/pull/64
+
 ## [v0.3.8](https://github.com/daaa1k/mdp/compare/v0.3.7...v0.3.8) - 2026-03-22
 - test: add e2e for macOS FileDrop by @daaa1k in https://github.com/daaa1k/mdp/pull/61
 
