@@ -40,6 +40,18 @@ description = "E2E: clipboard snapshot restore → mdp local → WebP (macOS onl
 run = "bash scripts/e2e-macos-clipboard-filedrop.sh"
 description = "E2E: file-drop PNG/WebP → mdp local → byte-identical output (macOS only; skips elsewhere)"
 
+[tasks.e2e-wsl-clipboard-webp]
+run = "bash scripts/e2e-wsl-clipboard-webp.sh"
+description = "E2E: clipboard PNG → mdp local → WebP (WSL2 only; skips elsewhere)"
+
+[tasks.e2e-wsl-clipboard-filedrop]
+run = "bash scripts/e2e-wsl-clipboard-filedrop.sh"
+description = "E2E: file-drop PNG/WebP → mdp local → byte-identical output (WSL2 only; skips elsewhere)"
+
+[tasks.e2e-ci-windows]
+run = "powershell.exe -Sta -NoProfile -ExecutionPolicy Bypass -File scripts/ci-e2e-windows.ps1"
+description = "E2E (CI parity): native Windows PowerShell clipboard; same fixtures as macOS/WSL2"
+
 [tasks.ci]
 depends = ["fmt-check", "lint", "test"]
 description = "Run all CI checks"
