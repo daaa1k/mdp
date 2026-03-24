@@ -14,6 +14,7 @@ import (
 	"image"
 	"image/color"
 	"io"
+	"sort"
 )
 
 const maxCodeLen = 15 // VP8L maximum Huffman code length
@@ -79,7 +80,8 @@ func Encode(w io.Writer, img image.Image) error {
 	// Distance: simple code, 1 unused symbol.
 	bw.writeBits(1, 1) // simple_code
 	bw.writeBits(0, 1) // num_symbols-1 = 0
-	bw.writeBits(0, 1) // is_first=false → 1-bit symbol value 0
+	bw.writeBits(0, 1) // is_first=false (1-bit symbol follows)
+	bw.writeBits(0, 1) // symbol value 0
 
 	// Encode pixels.
 	for i := range npix {
@@ -431,7 +433,7 @@ func codeLengthCodeLengths(freq []int) []uint {
 	// Cap at 7 bits.
 	for _, l := range lengths {
 		if l > 7 {
-			// Fall back to flat codes for all active symbols.
+			// Build a complete Huffman code that fits within 7 bits.
 			bits := uint(1)
 			for (1 << bits) < active {
 				bits++
@@ -439,10 +441,25 @@ func codeLengthCodeLengths(freq []int) []uint {
 			if bits > 7 {
 				bits = 7
 			}
-			flat := make([]uint, 19)
+			// Assign bits-1 to the most frequent (excess) symbols and
+			// bits to the rest so that the Kraft sum equals 1.
+			excess := (1 << bits) - active
+			type sf struct{ sym, freq int }
+			var syms []sf
 			for i, f := range freq {
 				if f > 0 {
-					flat[i] = bits
+					syms = append(syms, sf{i, f})
+				}
+			}
+			sort.Slice(syms, func(i, j int) bool {
+				return syms[i].freq > syms[j].freq
+			})
+			flat := make([]uint, 19)
+			for i, s := range syms {
+				if i < excess {
+					flat[s.sym] = bits - 1
+				} else {
+					flat[s.sym] = bits
 				}
 			}
 			return flat
