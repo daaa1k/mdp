@@ -69,4 +69,13 @@ if ! file "$OUT" | grep -qiE 'Web/P|WEBP|webp'; then
   exit 1
 fi
 
-echo "e2e ok: $OUT ($(file -b "$OUT"))"
+echo "format ok: $OUT ($(file -b "$OUT"))"
+
+# Verify the WebP can be decoded and is not all-white.
+VERIFY="$ROOT/scripts/verify-webp-roundtrip.go"
+if ! go run "$VERIFY" "$OUT"; then
+  echo "error: WebP verification failed" >&2
+  exit 1
+fi
+
+echo "e2e ok: format and content verified"
