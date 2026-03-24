@@ -1,3 +1,9 @@
+[![Release](https://img.shields.io/github/release/daaa1k/mdp.svg?style=for-the-badge)](https://github.com/daaa1k/mdp/releases/latest)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE)
+[![CI status](https://img.shields.io/github/actions/workflow/status/daaa1k/mdp/ci.yml?style=for-the-badge&branch=main)](https://github.com/daaa1k/mdp/actions?workflow=ci)
+[![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
+[![GoReportCard](https://goreportcard.com/badge/github.com/daaa1k/mdp?style=for-the-badge)](https://goreportcard.com/report/github.com/daaa1k/mdp)
+
 # mdp
 
 Paste clipboard image as Markdown link.
