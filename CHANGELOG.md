@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.10](https://github.com/daaa1k/mdp/compare/v0.3.9...v0.3.10) - 2026-03-24
+- fix(webpenc): fix two VP8L encoder bugs causing invalid Huffman trees by @daaa1k in https://github.com/daaa1k/mdp/pull/65
+
 ## [v0.3.9](https://github.com/daaa1k/mdp/compare/v0.3.8...v0.3.9) - 2026-03-23
 - test: add E2E test for windows by @daaa1k in https://github.com/daaa1k/mdp/pull/62
 - test: add E2E test for linux (wayland) by @daaa1k in https://github.com/daaa1k/mdp/pull/64
