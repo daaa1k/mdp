@@ -7,6 +7,9 @@ release:
   # Without this flag GoReleaser looks up releases via GET /releases/tags/{tag},
   # which returns 404 for drafts, causing a conflict or failure.
   use_existing_draft: true
+  extra_files:
+    - glob: LICENSE
+    - glob: CREDITS
 
 builds:
   - env:
