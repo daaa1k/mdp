@@ -88,7 +88,7 @@ Reads an image from the clipboard, saves it using the configured backend, and pr
 ### Options
 
 ```
---backend string   storage backend: local, r2, nodebb
+--backend string   storage backend: local, r2, nodebb(experimental)
 --debug            enable debug output to stderr
 ```
 
@@ -196,9 +196,11 @@ export R2_ACCESS_KEY_ID=...
 export R2_SECRET_ACCESS_KEY=...
 ```
 
-### nodebb
+### nodebb (experimental)
 
 Uploads to a NodeBB forum instance.
+
+> **Note:** This backend is experimental because uploaded images are not associated with any post. Depending on your NodeBB configuration, these files may be treated as orphans and automatically deleted by the orphan file cleanup routine.
 
 ```yaml
 nodebb:
