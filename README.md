@@ -10,6 +10,9 @@ Paste clipboard image as Markdown link.
 
 Reads an image from the clipboard, saves it to the configured backend, and prints a Markdown image link to stdout.
 
+![20260323_170037](https://github.com/user-attachments/assets/72d5ab81-f6aa-4a10-8696-18f3cd6e279f)
+
+
 ## Installation
 
 ### Homebrew (macOS / Linux)
