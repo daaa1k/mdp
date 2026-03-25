@@ -200,7 +200,8 @@ export R2_SECRET_ACCESS_KEY=...
 
 Uploads to a NodeBB forum instance.
 
-> **Note:** This backend is experimental because uploaded images are not associated with any post. Depending on your NodeBB configuration, these files may be treated as orphans and automatically deleted by the orphan file cleanup routine.
+> [!WARNING]
+> This backend is experimental because uploaded images are not associated with any post. Depending on your NodeBB configuration, these files may be treated as orphans and automatically deleted by the orphan file cleanup routine.
 
 ```yaml
 nodebb:
