@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.3.11](https://github.com/daaa1k/mdp/compare/v0.3.10...v0.3.11) - 2026-03-25
+
 ## [v0.3.10](https://github.com/daaa1k/mdp/compare/v0.3.9...v0.3.10) - 2026-03-24
 - fix(webpenc): fix two VP8L encoder bugs causing invalid Huffman trees by @daaa1k in https://github.com/daaa1k/mdp/pull/65
 
