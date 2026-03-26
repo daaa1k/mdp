@@ -1,6 +1,6 @@
 [tools]
 go = "1.26.0"
-golangci-lint = "v2.11.3"
+golangci-lint = "2.11.4"
 prek = "0.3.3"
 
 [tasks.test]
