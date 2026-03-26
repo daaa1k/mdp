@@ -31,7 +31,7 @@ jobs:
           echo "GOCACHE=$(go env GOCACHE)" >> "$GITHUB_ENV"
 
       - name: Cache Go modules and build
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ${{ env.GOMODCACHE }}
@@ -79,7 +79,7 @@ jobs:
         uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
 
       - name: Set up Cachix
-        uses: cachix/cachix-action@3ba601ff5bbb07c7220846facfa2cd81eeee15a1 # v16
+        uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
         with:
           name: daaa1k
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}

@@ -1,7 +1,6 @@
 [tools]
 go = "1.26.0"
 golangci-lint = "v2.11.3"
-pinact = "3.9.0"
 prek = "0.3.3"
 
 [tasks.test]
@@ -27,6 +26,14 @@ if [ -n "$output" ]; then
 fi
 """
 description = "Run formatting check"
+
+[tasks.renovate-check]
+run = "npx --yes --package renovate -- renovate-config-validator renovate.json"
+description = "Validate renovate.json"
+
+[tasks.pinact-update]
+run = "pinact run -u -m 5"
+description = "Update github actions' pinned dependencies (with minReleaseAge 5 days)"
 
 [tasks.build]
 run = "go build -o mdp ."
