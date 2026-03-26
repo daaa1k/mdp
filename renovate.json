@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "minimumReleaseAge": "5 days",
+  "schedule": ["* 10-14 * * 6"],
+  "timezone": "Asia/Tokyo",
+  "assignees": ["daaa1k"],
+  "prConcurrentLimit": 10,
+  "packageRules": [
+    {
+      "description": "Group Go module patch updates into one PR",
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "go patch dependencies",
+      "commitMessagePrefix": "build:"
+    },
+    {
+      "description": "Group GitHub Actions patch updates into one PR",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "github-actions patch",
+      "commitMessagePrefix": "ci:"
+    },
+    {
+      "description": "Prefix non-patch Go module updates",
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["major", "minor"],
+      "commitMessagePrefix": "build:"
+    },
+    {
+      "description": "Prefix non-patch GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major", "minor"],
+      "commitMessagePrefix": "ci:"
+    }
+  ]
+}

@@ -14,3 +14,10 @@ repos:
         entry: mise run lint
         types: [go]
         pass_filenames: false
+
+      - id: renovate-check
+        name: renovate config validator
+        language: system
+        entry: mise run renovate-check
+        files: ^renovate\.json$
+        pass_filenames: false
