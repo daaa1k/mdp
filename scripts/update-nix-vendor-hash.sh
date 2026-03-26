@@ -10,42 +10,58 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+extract_got() {
+  # grep exits 1 when there is no match; with pipefail + set -e that must not abort the script.
+  grep -Eo 'got:[[:space:]]*[^[:space:]]+' "$1" 2>/dev/null | head -1 | sed -E 's/^got:[[:space:]]*//I' | tr -d '\r' || true
+}
 
 if ! command -v nix >/dev/null 2>&1; then
   echo "error: nix is not in PATH (required to compute vendorHash)" >&2
   exit 1
 fi
 
-ERRFILE="$(mktemp)"
-trap 'rm -f "$ERRFILE"' EXIT
+COMBINED="$(mktemp)"
+trap 'rm -f "$COMBINED"' EXIT
 
-if nix build ".#mdp" --no-link 2>"$ERRFILE"; then
+set +e
+nix build ".#mdp" --no-link &>"$COMBINED"
+nix_rc=$?
+set -e
+
+if [[ "$nix_rc" -eq 0 ]]; then
   echo "vendorHash in flake.nix already matches go.mod / go.sum."
   exit 0
 fi
 
-got="$(sed -n 's/.*got:[[:space:]]*//p' "$ERRFILE" | head -1 | tr -d '\r')"
+got="$(extract_got "$COMBINED")"
+
+if [[ -n "$got" ]]; then
+  python3 "$SCRIPT_DIR/update_nix_vendor_hash_lib.py" apply "$got"
+  nix build ".#mdp" --no-link
+  echo "Verified: nix build .#mdp succeeds."
+  exit 0
+fi
+
+# No "got:" in the log — often "inconsistent vendoring": go.mod/go.sum changed but vendorHash
+# still matches the *old* module FOD, so Nix never reaches a fixed-output hash mismatch.
+# Temporarily use fakeHash so the go-modules FOD is recomputed and emits "got:".
+echo "First build did not report a FOD hash mismatch; retrying with vendorHash = pkgs.lib.fakeHash ..." >&2
+python3 "$SCRIPT_DIR/update_nix_vendor_hash_lib.py" set-fake
+
+set +e
+nix build ".#mdp" --no-link &>"$COMBINED"
+set -e
+
+got="$(extract_got "$COMBINED")"
 if [[ -z "$got" ]]; then
-  echo "nix build failed and no 'got:' hash was found in the log:" >&2
-  cat "$ERRFILE" >&2
+  echo "error: still no 'got:' hash after fakeHash; nix log:" >&2
+  cat "$COMBINED" >&2
   exit 1
 fi
 
-python3 -c "
-import pathlib, re, sys
-got = sys.argv[1].strip()
-path = pathlib.Path('flake.nix')
-text = path.read_text()
-
-def repl(m):
-    return m.group(1) + '\"' + got + '\"'
-
-new, n = re.subn(r'(vendorHash = )\"sha256-[^\"]+\"', repl, text, count=1)
-if n != 1:
-    sys.exit('expected exactly one vendorHash line in flake.nix')
-path.write_text(new)
-print('Updated vendorHash to', got)
-" "$got"
+python3 "$SCRIPT_DIR/update_nix_vendor_hash_lib.py" apply "$got"
 
 nix build ".#mdp" --no-link
 echo "Verified: nix build .#mdp succeeds."

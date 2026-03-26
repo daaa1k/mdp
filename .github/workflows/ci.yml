@@ -63,8 +63,53 @@ jobs:
         if: runner.os == 'Windows'
         run: mise run e2e-ci-windows
 
+  # Skip Nix until nix-vendor-hash.yml commits flake.nix (same PR may run CI in parallel first).
+  nix-skip-gate:
+    name: Nix skip gate (Renovate vendor hash)
+    runs-on: ubuntu-latest
+    outputs:
+      skip_nix: ${{ steps.check.outputs.skip_nix }}
+    steps:
+      - name: Check out source code
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Determine whether to skip Nix flake check
+        id: check
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "skip_nix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "${GITHUB_HEAD_REF}" != renovate/* ]]; then
+            echo "skip_nix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! files=$(git diff --name-only \
+            "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"); then
+            echo "skip_nix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          has_gomod=false
+          has_flake=false
+          while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            [[ "$f" == go.mod || "$f" == go.sum ]] && has_gomod=true
+            [[ "$f" == flake.nix ]] && has_flake=true
+          done <<< "$files"
+          if [[ "$has_gomod" == true && "$has_flake" == false ]]; then
+            echo "skip_nix=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_nix=false" >> "$GITHUB_OUTPUT"
+          fi
+
   nix:
     name: Nix flake check (${{ matrix.os }})
+    needs: nix-skip-gate
+    if: needs.nix-skip-gate.outputs.skip_nix != 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
