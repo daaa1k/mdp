@@ -1,0 +1,58 @@
+name: Nix vendorHash (Renovate)
+
+# After Renovate opens or updates a PR that changes Go modules, compute the new
+# buildGoModule vendorHash and push a follow-up commit to the same branch.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "go.mod"
+      - "go.sum"
+
+concurrency:
+  group: nix-vendor-hash-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-vendor-hash:
+    name: Update vendorHash
+    runs-on: ubuntu-latest
+    if: >
+      startsWith(github.head_ref, 'renovate/') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
+
+      - name: Set up Cachix
+        uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
+        with:
+          name: daaa1k
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          pushFilter: "-source$"
+
+      - name: Update flake.nix vendorHash
+        run: ./scripts/update-nix-vendor-hash.sh
+
+      - name: Commit and push
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flake.nix
+          if git diff --staged --quiet; then
+            echo "No vendorHash change; nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(nix): update vendorHash for go.mod changes"
+          git push origin "HEAD:${HEAD_REF}"
