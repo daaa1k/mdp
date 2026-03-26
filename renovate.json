@@ -22,6 +22,13 @@
       "commitMessagePrefix": "ci:"
     },
     {
+      "description": "Group mise patch updates into one PR",
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "mise patch dependencies",
+      "commitMessagePrefix": "chore:"
+    },
+    {
       "description": "Prefix non-patch Go module updates",
       "matchManagers": ["gomod"],
       "matchUpdateTypes": ["major", "minor"],
@@ -32,6 +39,12 @@
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["major", "minor"],
       "commitMessagePrefix": "ci:"
+    },
+    {
+      "description": "Prefix non-patch mise updates",
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["major", "minor"],
+      "commitMessagePrefix": "chore:"
     }
   ]
 }
