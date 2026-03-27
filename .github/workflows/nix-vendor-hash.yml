@@ -21,6 +21,9 @@ jobs:
   update-vendor-hash:
     name: Update vendorHash
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 30
     if: >
       startsWith(github.head_ref, 'renovate/') &&
       github.event.pull_request.head.repo.full_name == github.repository
@@ -29,6 +32,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
 
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
@@ -46,6 +50,7 @@ jobs:
       - name: Commit and push
         env:
           HEAD_REF: ${{ github.head_ref }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -55,4 +60,5 @@ jobs:
             exit 0
           fi
           git commit -m "chore(nix): update vendorHash for go.mod changes"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin "HEAD:${HEAD_REF}"

@@ -12,6 +12,9 @@ jobs:
   test:
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -20,6 +23,8 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup mise
         uses: jdx/mise-action@c1ecc8f748cd28cdeabf76dab3cccde4ce692fe4 # v4.0.0
@@ -67,6 +72,9 @@ jobs:
   nix-skip-gate:
     name: Nix skip gate (Renovate vendor hash)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
     outputs:
       skip_nix: ${{ steps.check.outputs.skip_nix }}
     steps:
@@ -75,6 +83,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Determine whether to skip Nix flake check
         id: check
@@ -111,6 +120,9 @@ jobs:
     needs: nix-skip-gate
     if: needs.nix-skip-gate.outputs.skip_nix != 'true'
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -119,6 +131,8 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34

@@ -79,3 +79,10 @@ depends = ["credits"]
 run = """
 git add CHANGELOG.md CREDITS go.mod go.sum
 """
+
+[tasks.github-actions-lint]
+run = [
+  "actionlint",
+  "ghalint run",
+  "zizmor .",
+]
