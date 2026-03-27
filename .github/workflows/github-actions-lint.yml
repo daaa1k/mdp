@@ -1,0 +1,19 @@
+name: GitHub Actions Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: daaa1k/github-actions-lint@da8a31ebd224d959b6a96b0bc389b948acb4648c # v1.0.0

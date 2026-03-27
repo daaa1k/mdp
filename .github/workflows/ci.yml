@@ -120,6 +120,7 @@ jobs:
     needs: nix-skip-gate
     if: needs.nix-skip-gate.outputs.skip_nix != 'true'
     runs-on: ${{ matrix.os }}
+    environment: ci
     permissions:
       contents: read
     timeout-minutes: 45
