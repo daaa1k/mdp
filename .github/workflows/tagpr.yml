@@ -128,7 +128,6 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
           persist-credentials: false
 
       - name: Download checksums from GoReleaser job
@@ -159,7 +158,19 @@ jobs:
       - name: Commit updated flake.nix
         env:
           TAGPR_TAG: ${{ needs.tagpr.outputs.tagpr-tag }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
+          set -euo pipefail
+          # ghalint requires checkout persist-credentials: false; use ssh-agent here for push only.
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/deploy_key
+          rm ~/.ssh/deploy_key
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git remote set-url origin "git@github.com:${GITHUB_REPOSITORY}.git"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add flake.nix
