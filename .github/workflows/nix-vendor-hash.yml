@@ -21,6 +21,7 @@ jobs:
   update-vendor-hash:
     name: Update vendorHash
     runs-on: ubuntu-latest
+    environment: ci
     permissions:
       contents: write
     timeout-minutes: 30

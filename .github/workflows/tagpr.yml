@@ -51,6 +51,7 @@ jobs:
     needs: tagpr
     if: needs.tagpr.outputs.tagpr-tag != ''
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       actions: write
       contents: write
@@ -119,6 +120,7 @@ jobs:
     name: Update Nix binary hashes
     needs: [tagpr, assets]
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       actions: read
       contents: write
