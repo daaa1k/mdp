@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.3.13](https://github.com/daaa1k/mdp/compare/v0.3.12...v0.3.13) - 2026-03-27
+
 ## [v0.3.12](https://github.com/daaa1k/mdp/compare/v0.3.11...v0.3.12) - 2026-03-27
 - ci(deps): migrate from Dependabot to Renovate by @daaa1k in https://github.com/daaa1k/mdp/pull/68
 - build: Update module golang.org/x/image to v0.38.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/74
