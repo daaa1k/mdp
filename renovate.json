@@ -45,6 +45,18 @@
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["major", "minor"],
       "commitMessagePrefix": "chore:"
+    },
+    {
+      "description": "Do not apply minimum release age to daaa1k GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["daaa1k/{/,}**"],
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Do not apply minimum release age to copier",
+      "matchManagers": ["copier"],
+      "minimumReleaseAge": null,
+      "commitMessagePrefix": "chore:"
     }
   ]
 }
