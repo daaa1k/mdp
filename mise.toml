@@ -1,6 +1,6 @@
 [tools]
 go = "1.26.1"
-golangci-lint = "v2.11.3"
+golangci-lint = "2.11.4"
 prek = "0.3.3"
 
 [tasks.test]
@@ -73,12 +73,14 @@ go install github.com/Songmu/gocredits/cmd/gocredits@latest
 go mod download
 gocredits -skip-missing -w .
 """
+description = "Update CREDITS"
 
 [tasks.prerelease-for-tagpr]
 depends = ["credits"]
 run = """
 git add CHANGELOG.md CREDITS go.mod go.sum
 """
+description = "Update CREDITS and add stage the relevant files"
 
 [tasks.github-actions-lint]
 run = [
@@ -86,3 +88,12 @@ run = [
   "ghalint run",
   "zizmor .",
 ]
+description = "Run github actions lint"
+
+[tasks.copier-check]
+run = "copier check-update"
+description = "Check updates for template"
+
+[tasks.copier-update]
+run = "copier update"
+description = "Apply updates for template"
