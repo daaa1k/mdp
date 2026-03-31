@@ -25,6 +25,9 @@ mise trust
 echo "==> mise install"
 mise install
 
+echo "==> mise lock"
+mise lock
+
 echo "==> prek install"
 mise exec -- prek install
 
