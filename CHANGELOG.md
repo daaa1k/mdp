@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.3.14](https://github.com/daaa1k/mdp/compare/v0.3.13...v0.3.14) - 2026-04-25
+- ci: add github-actions-lint by @daaa1k in https://github.com/daaa1k/mdp/pull/77
+- ci: Update jdx/mise-action action to v4.0.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/73
+- chore(deps): update dependency https://github.com/daaa1k/template-go to v0.1.9 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/79
+- chore: Update dependency https://github.com/daaa1k/template-go to v0.1.12 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/80
+- ci: Update daaa1k/github-actions-lint action to v1.0.4 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/81
+- ci: Update Songmu/tagpr action to v1.18.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/84
+- chore: update dependency https://github.com/daaa1k/common-config to v1.3.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/85
+- chore: update dependency go to v1.26.2 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/86
+- chore: update dependency https://github.com/daaa1k/template-go to v0.1.16 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/89
+- chore: update dependency https://github.com/daaa1k/common-config to v1.5.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/90
+- build: update module golang.org/x/image to v0.39.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/88
+- chore: add typoes extend-id by @daaa1k in https://github.com/daaa1k/mdp/pull/91
+
 ## [v0.3.13](https://github.com/daaa1k/mdp/compare/v0.3.12...v0.3.13) - 2026-03-27
 
 ## [v0.3.12](https://github.com/daaa1k/mdp/compare/v0.3.11...v0.3.12) - 2026-03-27
