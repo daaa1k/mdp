@@ -4,6 +4,34 @@
 version = "1.26.2"
 backend = "core:go"
 
+[tools.go."platforms.linux-arm64"]
+checksum = "sha256:c958a1fe1b361391db163a485e21f5f228142d6f8b584f6bef89b26f66dc5b23"
+url = "https://dl.google.com/go/go1.26.2.linux-arm64.tar.gz"
+
+[tools.go."platforms.linux-arm64-musl"]
+checksum = "sha256:c958a1fe1b361391db163a485e21f5f228142d6f8b584f6bef89b26f66dc5b23"
+url = "https://dl.google.com/go/go1.26.2.linux-arm64.tar.gz"
+
+[tools.go."platforms.linux-x64"]
+checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
+url = "https://dl.google.com/go/go1.26.2.linux-amd64.tar.gz"
+
+[tools.go."platforms.linux-x64-musl"]
+checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
+url = "https://dl.google.com/go/go1.26.2.linux-amd64.tar.gz"
+
+[tools.go."platforms.macos-arm64"]
+checksum = "sha256:32af1522bf3e3ff3975864780a429cc0b41d190ec7bf90faa661d6d64566e7af"
+url = "https://dl.google.com/go/go1.26.2.darwin-arm64.tar.gz"
+
+[tools.go."platforms.macos-x64"]
+checksum = "sha256:bc3f1500d9968c36d705442d90ba91addf9271665033748b82532682e90a7966"
+url = "https://dl.google.com/go/go1.26.2.darwin-amd64.tar.gz"
+
+[tools.go."platforms.windows-x64"]
+checksum = "sha256:98eb3570bade15cb826b0909338df6cc6d2cf590bc39c471142002db3832b708"
+url = "https://dl.google.com/go/go1.26.2.windows-amd64.zip"
+
 [[tools.golangci-lint]]
 version = "2.11.4"
 backend = "aqua:golangci/golangci-lint"
@@ -11,30 +39,37 @@ backend = "aqua:golangci/golangci-lint"
 [tools.golangci-lint."platforms.linux-arm64"]
 checksum = "sha256:3bcfa2e6f3d32b2bf5cd75eaa876447507025e0303698633f722a05331988db4"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-linux-arm64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.linux-arm64-musl"]
 checksum = "sha256:3bcfa2e6f3d32b2bf5cd75eaa876447507025e0303698633f722a05331988db4"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-linux-arm64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.linux-x64"]
 checksum = "sha256:200c5b7503f67b59a6743ccf32133026c174e272b930ee79aa2aa6f37aca7ef1"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-linux-amd64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.linux-x64-musl"]
 checksum = "sha256:200c5b7503f67b59a6743ccf32133026c174e272b930ee79aa2aa6f37aca7ef1"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-linux-amd64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.macos-arm64"]
 checksum = "sha256:02db2a2dae8b26812e53b0688a6f617e3ef1f489790e829ea22862cf76945675"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-darwin-arm64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.macos-x64"]
 checksum = "sha256:c900d4048db75d1edfd550fd11cf6a9b3008e7caa8e119fcddbc700412d63e60"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-darwin-amd64.tar.gz"
+provenance = "github-attestations"
 
 [tools.golangci-lint."platforms.windows-x64"]
 checksum = "sha256:4932cfca5e75bf60fe1c576edf459e5e809e6644664a068185d64b84af3fad9e"
 url = "https://github.com/golangci/golangci-lint/releases/download/v2.11.4/golangci-lint-2.11.4-windows-amd64.zip"
+provenance = "github-attestations"
 
 [[tools.prek]]
 version = "0.3.3"
@@ -43,27 +78,34 @@ backend = "aqua:j178/prek"
 [tools.prek."platforms.linux-arm64"]
 checksum = "sha256:02628a23f55a88620dcb8ba90987556c7e42ff9f9c7a4359afb1f2ac2884b620"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-aarch64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.linux-arm64-musl"]
 checksum = "sha256:02628a23f55a88620dcb8ba90987556c7e42ff9f9c7a4359afb1f2ac2884b620"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-aarch64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64"]
 checksum = "sha256:4967cead51c26313c9dfdad0d2cdedf52ccbfc3d5ebd5dfd61676c45668f3791"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-x86_64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64-musl"]
 checksum = "sha256:4967cead51c26313c9dfdad0d2cdedf52ccbfc3d5ebd5dfd61676c45668f3791"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-x86_64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.macos-arm64"]
 checksum = "sha256:12c1e281d4d484eaa6d502804c6a8c77ab06f1fdd22c5fd46c02f87ae5f3c1af"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-aarch64-apple-darwin.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.macos-x64"]
 checksum = "sha256:0b65555d2bd2add6b24a1f2be51cfee6d0c837892560baf2c2163bdafafed338"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-x86_64-apple-darwin.tar.gz"
+provenance = "github-attestations"
 
 [tools.prek."platforms.windows-x64"]
 checksum = "sha256:c829796e1ddad21e82eef768cee01469880caff7b073a2f1c01073fe075d8ba7"
 url = "https://github.com/j178/prek/releases/download/v0.3.3/prek-x86_64-pc-windows-msvc.zip"
+provenance = "github-attestations"
