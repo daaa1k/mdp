@@ -1,0 +1,7 @@
+[default.extend-identifiers]
+# macOS AppleScript / Apple event class (PNG in clipboard)
+PNGf = "PNGf"
+
+[default.extend-words]
+# "PN" inside «class PNGf»; typos otherwise suggests "ON"
+PN = "PN"
