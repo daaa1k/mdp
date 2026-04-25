@@ -1,3 +1,4 @@
+<<<<<<< before updating
 # Agent notes
 
 ## Language
@@ -21,3 +22,22 @@ mdp is a single Go CLI binary with no runtime service dependencies. All developm
 - No CGO is required; the WebP encoder is pure Go.
 - `mise.toml` defines convenience tasks (`mise run ci`, `mise run test`, etc.) but all underlying commands are plain `go` and can be run directly.
 - The `.pre-commit-config.yaml` hooks call `mise run fmt` and `mise run lint`. These are not installed in Cloud VMs by default; the equivalent direct commands are `gofmt -w .` and `go vet ./...`.
+=======
+# Agent instructions
+
+## Architecture Decision Records (ADR)
+
+### Before making technical decisions
+
+- Always review existing ADRs under `./docs/adr/` before choosing technologies, architecture, APIs, or other long‑impact technical directions.
+- Treat merged ADRs as the project’s recorded conclusions; align new work with them unless you intentionally supersede or deprecate them (see `./docs/adr/README.md`).
+
+### When recording new decisions
+
+- When a new meaningful technical decision is made (or when alternatives were seriously considered), add an ADR as a new Markdown file in `./docs/adr/`, following `./docs/adr/template.md` and the rules in `./docs/adr/README.md` (naming, status, alternatives, PR flow).
+
+### References
+
+- `./docs/adr/README.md` — operating rules and lifecycle
+- `./docs/adr/template.md` — ADR structure
+>>>>>>> after updating
