@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.3.15](https://github.com/daaa1k/mdp/compare/v0.3.14...v0.3.15) - 2026-04-25
+
 ## [v0.3.14](https://github.com/daaa1k/mdp/compare/v0.3.13...v0.3.14) - 2026-04-25
 - ci: add github-actions-lint by @daaa1k in https://github.com/daaa1k/mdp/pull/77
 - ci: Update jdx/mise-action action to v4.0.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/73
