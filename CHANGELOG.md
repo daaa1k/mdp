@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.16](https://github.com/daaa1k/mdp/compare/v0.3.15...v0.3.16) - 2026-05-09
+- chore: update dependency https://github.com/daaa1k/template-go to v0.1.17 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/93
+- ci: update aquasecurity/trivy-action action to v0.36.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/96
+- ci: update goreleaser/goreleaser-action action to v7.2.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/97
+- fix(ci): NodeBB cookie persistence and gosec G124 by @daaa1k in https://github.com/daaa1k/mdp/pull/100
+
 ## [v0.3.15](https://github.com/daaa1k/mdp/compare/v0.3.14...v0.3.15) - 2026-04-25
 
 ## [v0.3.14](https://github.com/daaa1k/mdp/compare/v0.3.13...v0.3.14) - 2026-04-25
