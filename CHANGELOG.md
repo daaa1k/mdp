@@ -14,7 +14,7 @@
 - chore: update dependency https://github.com/daaa1k/template-go to v0.1.16 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/89
 - chore: update dependency https://github.com/daaa1k/common-config to v1.5.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/90
 - build: update module golang.org/x/image to v0.39.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/88
-- chore: add typoes extend-id by @daaa1k in https://github.com/daaa1k/mdp/pull/91
+- chore: add typos extend-id by @daaa1k in https://github.com/daaa1k/mdp/pull/91
 
 ## [v0.3.13](https://github.com/daaa1k/mdp/compare/v0.3.12...v0.3.13) - 2026-03-27
 
