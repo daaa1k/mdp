@@ -228,6 +228,10 @@ type cookieEntry struct {
 	Path    string `json:"path"`
 	Secure  bool   `json:"secure"`
 	Expires int64  `json:"expires"`
+	// HttpOnly and SameSite use pointers so "omitted in JSON" (legacy files) can
+	// be distinguished from explicit false / zero from the cookie jar.
+	HttpOnly *bool `json:"httpOnly,omitempty"`
+	SameSite *int  `json:"sameSite,omitempty"`
 }
 
 // saveCookies persists session cookies to disk.
@@ -242,12 +246,16 @@ func (b *NodeBBBackend) saveCookies() error {
 	cookies := b.jar.Cookies(u)
 	entries := make([]cookieEntry, 0, len(cookies))
 	for _, c := range cookies {
+		h := c.HttpOnly
+		s := int(c.SameSite)
 		e := cookieEntry{
-			Name:   c.Name,
-			Value:  c.Value,
-			Domain: c.Domain,
-			Path:   c.Path,
-			Secure: c.Secure,
+			Name:     c.Name,
+			Value:    c.Value,
+			Domain:   c.Domain,
+			Path:     c.Path,
+			Secure:   c.Secure,
+			HttpOnly: &h,
+			SameSite: &s,
 		}
 		if !c.Expires.IsZero() {
 			e.Expires = c.Expires.Unix()
@@ -283,18 +291,35 @@ func (b *NodeBBBackend) loadCookies() error {
 	}
 	cookies := make([]*http.Cookie, 0, len(entries))
 	for _, e := range entries {
-		c := &http.Cookie{
-			Name:   e.Name,
-			Value:  e.Value,
-			Domain: e.Domain,
-			Path:   e.Path,
-			Secure: e.Secure,
-		}
-		if e.Expires != 0 {
-			c.Expires = time.Unix(e.Expires, 0)
-		}
-		cookies = append(cookies, c)
+		cookies = append(cookies, nodebbCookieFromEntry(e))
 	}
 	b.jar.SetCookies(u, cookies)
 	return nil
+}
+
+// nodebbCookieFromEntry rebuilds an http.Cookie from disk-backed jar metadata.
+// Cookies are not created for browser contexts; fields mirror the prior jar snapshot.
+//
+//nolint:gosec // G124: composite-literal/declaration forms are flagged before assignments; attributes are set immediately from persisted data.
+func nodebbCookieFromEntry(e cookieEntry) *http.Cookie {
+	httpOnly := true
+	if e.HttpOnly != nil {
+		httpOnly = *e.HttpOnly
+	}
+	sameSite := http.SameSiteLaxMode
+	if e.SameSite != nil {
+		sameSite = http.SameSite(*e.SameSite)
+	}
+	var c http.Cookie
+	c.Name = e.Name
+	c.Value = e.Value
+	c.Domain = e.Domain
+	c.Path = e.Path
+	c.Secure = e.Secure
+	c.HttpOnly = httpOnly
+	c.SameSite = sameSite
+	if e.Expires != 0 {
+		c.Expires = time.Unix(e.Expires, 0)
+	}
+	return &c
 }
