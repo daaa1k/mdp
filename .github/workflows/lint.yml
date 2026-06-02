@@ -20,6 +20,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: daaa1k/common-lint@6a7517170a90fb3129892f9c8a6e6c37e82e3715 # v1.4.1
+      - uses: daaa1k/common-lint@f4e2ac7dec1cf10147331596c5eaf3d5f132722e # v1.4.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
