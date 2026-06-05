@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.3.17](https://github.com/daaa1k/mdp/compare/v0.3.16...v0.3.17) - 2026-06-02
+- ci: update goreleaser/goreleaser-action action to v7.2.2 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/105
+- chore: update dependency prek to v0.4.2 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/104
+- ci: update Songmu/tagpr action to v1.19.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/103
+- build: update module golang.org/x/image to v0.40.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/102
+- chore: update mise patch dependencies by @renovate[bot] in https://github.com/daaa1k/mdp/pull/101
+
 ## [v0.3.16](https://github.com/daaa1k/mdp/compare/v0.3.15...v0.3.16) - 2026-05-09
 - chore: update dependency https://github.com/daaa1k/template-go to v0.1.17 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/93
 - ci: update aquasecurity/trivy-action action to v0.36.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/96
