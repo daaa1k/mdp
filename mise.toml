@@ -4,7 +4,11 @@ install_before = "5d"
 [tools]
 go = "1.26.3"
 golangci-lint = "2.12.2"
+<<<<<<< before updating
 prek = "0.4.3"
+=======
+prek = "0.4.1"
+>>>>>>> after updating
 
 [tasks.test]
 run = "go test ./... -coverprofile=coverage.out -covermode=count -count=1"
