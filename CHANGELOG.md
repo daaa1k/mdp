@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.18](https://github.com/daaa1k/mdp/compare/v0.3.17...v0.3.18) - 2026-06-21
+- build: update module golang.org/x/image to v0.41.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/108
+- chore: update dependency https://github.com/daaa1k/template-go to v0.1.19 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/107
+- ci: update github-actions patch to v6.0.3 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/110
+- chore: update mise patch dependencies by @renovate[bot] in https://github.com/daaa1k/mdp/pull/109
+- ci: update jdx/mise-action action to v4.1.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/113
+- build: update module golang.org/x/image to v0.42.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/112
+- [codex] add renovate automerge opt-in by @daaa1k in https://github.com/daaa1k/mdp/pull/114
+
 ## [v0.3.17](https://github.com/daaa1k/mdp/compare/v0.3.16...v0.3.17) - 2026-06-02
 - ci: update goreleaser/goreleaser-action action to v7.2.2 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/105
 - chore: update dependency prek to v0.4.2 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/104
