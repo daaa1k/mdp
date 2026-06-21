@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "allowedAuthors": ["renovate[bot]"],
+  "requiredLabels": ["renovate-automerge"],
+  "excludedLabels": [],
+  "excludedBranches": [],
+  "stopCommentTemplate": "default"
+}
