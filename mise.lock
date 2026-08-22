@@ -83,9 +83,9 @@ version = "0.4.13"
 backend = "aqua:j178/prek"
 
 [tools.prek."platforms.linux-arm64"]
-checksum = "sha256:ecbddcf4aad45eca7073f62dcea717f1e523901ada5c2fd668e6dce812f7790e"
-url = "https://github.com/j178/prek/releases/download/v0.4.13/prek-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/508529763"
+checksum = "sha256:08ee04c20f3738356a5c2631a09d1d370c94093f28b3ad0857d0757e34d51860"
+url = "https://github.com/j178/prek/releases/download/v0.4.13/prek-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/508529757"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-arm64-musl"]
@@ -95,9 +95,9 @@ url_api = "https://api.github.com/repos/j178/prek/releases/assets/508529763"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64"]
-checksum = "sha256:15dbf93535fc956a09e0e13e0529f364aff94c9d048f36a41571bb802e096ec0"
-url = "https://github.com/j178/prek/releases/download/v0.4.13/prek-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/508529829"
+checksum = "sha256:db31d0c5be937602002ab21e70ebf07c6566cc4428c9095f04fa546e12e7ccb0"
+url = "https://github.com/j178/prek/releases/download/v0.4.13/prek-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/508529827"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64-musl"]
