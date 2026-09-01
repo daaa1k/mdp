@@ -2,7 +2,7 @@
 install_before = "5d"
 
 [tools]
-go = "1.26.6"
+go = "1.27.0"
 golangci-lint = "2.12.2"
 prek = "0.4.14"
 
