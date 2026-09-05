@@ -4,7 +4,7 @@ install_before = "5d"
 [tools]
 go = "1.27.0"
 golangci-lint = "2.13.2"
-prek = "0.4.14"
+prek = "0.5.0"
 
 [tasks.test]
 run = "go test ./... -coverprofile=coverage.out -covermode=count -count=1"
