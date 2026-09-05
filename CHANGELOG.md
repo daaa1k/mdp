@@ -1,5 +1,37 @@
 # Changelog
 
+## [v0.3.19](https://github.com/daaa1k/mdp/compare/v0.3.18...v0.3.19) - 2026-09-05
+
+- chore: update dependency https://github.com/daaa1k/common-config to v1.5.5 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/115
+- chore: update dependency prek to v0.4.5 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/116
+- ci: update actions/cache action to v5.1.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/119
+- ci: update actions/setup-go action to v6.5.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/120
+- ci: update jdx/mise-action action to v4.2.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/121
+- build: update module golang.org/x/image to v0.43.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/118
+- chore: update dependency prek to v0.4.8 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/123
+- ci: update goreleaser/goreleaser-action action to v7.2.3 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/124
+- chore: update mise patch dependencies by @renovate[bot] in https://github.com/daaa1k/mdp/pull/125
+- build: update module golang.org/x/image to v0.44.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/126
+- chore: update dependency prek to v0.4.10 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/127
+- ci: update jdx/mise-action action to v4.2.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/128
+- ci: update Songmu/tagpr action to v1.20.1 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/129
+- chore(deps): lock file maintenance by @renovate[bot] in https://github.com/daaa1k/mdp/pull/122
+- ci: update actions/cache action to v6 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/130
+- chore: update dependency prek to v0.4.11 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/131
+- ci: update jdx/mise-action action to v4.2.3 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/132
+- chore(deps): lock file maintenance by @renovate[bot] in https://github.com/daaa1k/mdp/pull/133
+- ci: update jdx/mise-action action to v4.2.4 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/134
+- ci: update actions/checkout action to v6.1.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/135
+- ci: update actions/checkout action to v7 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/136
+- ci: update actions/setup-go action to v7 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/137
+- chore: update dependency prek to v0.4.13 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/139
+- ci: update nixbuild/nix-quick-install-action action to v35 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/140
+- ci: update jdx/mise-action action to v4.2.5 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/142
+- chore: update mise patch dependencies by @renovate[bot] in https://github.com/daaa1k/mdp/pull/141
+- build: update module golang.org/x/image to v0.45.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/143
+- chore: update dependency go to v1.27.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/144
+- chore: update dependency prek to v0.5.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/146
+
 ## [v0.3.18](https://github.com/daaa1k/mdp/compare/v0.3.17...v0.3.18) - 2026-06-21
 - build: update module golang.org/x/image to v0.41.0 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/108
 - chore: update dependency https://github.com/daaa1k/template-go to v0.1.19 by @renovate[bot] in https://github.com/daaa1k/mdp/pull/107
