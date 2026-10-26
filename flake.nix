@@ -156,7 +156,7 @@
           #   1. Set vendorHash to pkgs.lib.fakeHash
           #   2. Run: nix build .#mdp 2>&1 | grep 'got:'
           #   3. Replace the value below with the hash shown in 'got:'
-          vendorHash = "sha256-GwuTFZPnzWRk8oW9GGQnLo7WnNcIt2HWMpk2Pftq30E=";
+          vendorHash = "sha256-gDkcBeMP+Sy+r6NH7KtZ8077K0i1JNPGxlkZgqP192Y=";
 
           ldflags = ["-s" "-w" "-X main.version=${version}"];
 
