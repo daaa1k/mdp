@@ -3,7 +3,7 @@ install_before = "5d"
 
 [tools]
 go = "1.27.3"
-golangci-lint = "2.14.0"
+golangci-lint = "2.15.0"
 prek = "0.5.7"
 
 [tasks.test]
