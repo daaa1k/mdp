@@ -3,37 +3,37 @@
 lockfile_version = 1
 
 [[tools.go]]
-version = "1.27.3"
+version = "1.27.4"
 backend = "core:go"
-specifiers = ["1.27.3"]
+specifiers = ["1.27.4"]
 
 [tools.go."platforms.linux-arm64"]
-checksum = "sha256:a06e99309dbcbdca1a8ccd2282c3ee146e55930886e26b4f1193269587165f49"
-url = "https://dl.google.com/go/go1.27.3.linux-arm64.tar.gz"
+checksum = "sha256:3392582988a273a87ab5043ee1b2c9c17a2c3c00580bf9326c47a2e0aaaeac92"
+url = "https://dl.google.com/go/go1.27.4.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-arm64-musl"]
-checksum = "sha256:a06e99309dbcbdca1a8ccd2282c3ee146e55930886e26b4f1193269587165f49"
-url = "https://dl.google.com/go/go1.27.3.linux-arm64.tar.gz"
+checksum = "sha256:3392582988a273a87ab5043ee1b2c9c17a2c3c00580bf9326c47a2e0aaaeac92"
+url = "https://dl.google.com/go/go1.27.4.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
-checksum = "sha256:65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40"
-url = "https://dl.google.com/go/go1.27.3.linux-amd64.tar.gz"
+checksum = "sha256:7226736c2339719cda28fbf3a54d71aa63bcefe376e98cef00034268dab24840"
+url = "https://dl.google.com/go/go1.27.4.linux-amd64.tar.gz"
 
 [tools.go."platforms.linux-x64-musl"]
-checksum = "sha256:65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40"
-url = "https://dl.google.com/go/go1.27.3.linux-amd64.tar.gz"
+checksum = "sha256:7226736c2339719cda28fbf3a54d71aa63bcefe376e98cef00034268dab24840"
+url = "https://dl.google.com/go/go1.27.4.linux-amd64.tar.gz"
 
 [tools.go."platforms.macos-arm64"]
-checksum = "sha256:dd3908cf20959d798c1e06ebe5b72213f0505ce01373b40ce3110975a6cd99c2"
-url = "https://dl.google.com/go/go1.27.3.darwin-arm64.tar.gz"
+checksum = "sha256:91a44a2b8a716600ad94a4f143e156116620db8828086a6e3602291be9bd0bb4"
+url = "https://dl.google.com/go/go1.27.4.darwin-arm64.tar.gz"
 
 [tools.go."platforms.macos-x64"]
-checksum = "sha256:b6f8e931e4ab497fcde6da8ae4499a58f9d258e55c8a80824a516eae5950a750"
-url = "https://dl.google.com/go/go1.27.3.darwin-amd64.tar.gz"
+checksum = "sha256:2b799377704ef12db39bd254995d5c348c9cc8d86562ca817724390e56c38f43"
+url = "https://dl.google.com/go/go1.27.4.darwin-amd64.tar.gz"
 
 [tools.go."platforms.windows-x64"]
-checksum = "sha256:f26081f438319757f8a1b46d7d0b2c5ec7583d4038e485e0aa725cfde7885fff"
-url = "https://dl.google.com/go/go1.27.3.windows-amd64.zip"
+checksum = "sha256:178ab98950ac69ab25069307dc6ade79f3816e414cce95b4da166a115cde1e7e"
+url = "https://dl.google.com/go/go1.27.4.windows-amd64.zip"
 
 [[tools.golangci-lint]]
 version = "2.15.0"
@@ -83,48 +83,48 @@ url_api = "https://api.github.com/repos/golangci/golangci-lint/releases/assets/6
 provenance = "github-attestations"
 
 [[tools.prek]]
-version = "0.5.9"
+version = "0.5.10"
 backend = "aqua:j178/prek"
-specifiers = ["0.5.9"]
+specifiers = ["0.5.10"]
 
 [tools.prek."platforms.linux-arm64"]
-checksum = "sha256:cf9cb3eeb5537064c9d73d78313a79ee707f3faa340ca0db1f5646d7897bc7dd"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760439"
+checksum = "sha256:6ee3e5696f0b76bb4c95708579a54714aabd9a20e89c998f69a1a5cc41dbbbee"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839366"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-arm64-musl"]
-checksum = "sha256:87a377330104591e50e91388164d8d4740f35e91475a6150c49bca7ed70d46aa"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760445"
+checksum = "sha256:352b97c18cc1659786232f3fde9e75b5ec96279893563f6b31b36f2d43dca00f"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839372"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64"]
-checksum = "sha256:2fee13923018dd517c19dba032ddcae8010cadfb81bc47e742ad5e8981a3f126"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760524"
+checksum = "sha256:5c832a9ccd0855b7c054320d8921d90165a37459d3ac175923bdf121ff1aa9b1"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839458"
 provenance = "github-attestations"
 
 [tools.prek."platforms.linux-x64-musl"]
-checksum = "sha256:7b00ac6a6e4cbb5d1711cb759c1fc279281d1446317ebede513a4d03bf7a7e2c"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760529"
+checksum = "sha256:c70a639cb98c90feafa213c23fb487644af73c906c5a6cee757403090f253c30"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839467"
 provenance = "github-attestations"
 
 [tools.prek."platforms.macos-arm64"]
-checksum = "sha256:cc9020726b7c86cce420b75d70f48b9ffa161bb5095a99678c0a87218f48d493"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760404"
+checksum = "sha256:28186099374a3158e7b27e82fedb0bd20723658dc8ee24a841bdffe8a91b1ad9"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839320"
 provenance = "github-attestations"
 
 [tools.prek."platforms.macos-x64"]
-checksum = "sha256:a7e6be8c62be36c5eda5cb70cc053b29e2941853dc0c3d859710f2651052d516"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760479"
+checksum = "sha256:bbd0cb4b8d2dea949730ba631e5176e99507e5d799464ea8d71386af98bdcb0a"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839419"
 provenance = "github-attestations"
 
 [tools.prek."platforms.windows-x64"]
-checksum = "sha256:b772063b6d9195c0647c0e73cfa258208d03b2b51abff115b76d24aefa189d0b"
-url = "https://github.com/j178/prek/releases/download/v0.5.9/prek-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/j178/prek/releases/assets/691760496"
+checksum = "sha256:4a506e19a95a1bbf40f304b245446c32078c7be4d5b7e4cb412ea93a0cf8b4e5"
+url = "https://github.com/j178/prek/releases/download/v0.5.10/prek-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/j178/prek/releases/assets/707839436"
 provenance = "github-attestations"
